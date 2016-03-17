@@ -1,1 +1,1 @@
-A project for my graduation.
+NGP,National Game Platform,aims at collecting and managing national games. 
