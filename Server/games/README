@@ -1,0 +1,7 @@
+Dir 'games' containing 4 subdir as following.
+1.icons: icons of all the game are in it.
+2.describes: files describing games.
+3.manual:	manuals of games.
+4.download: storing the installer of games if they have.
+
+Icon, describing file, manual and installer must be placed to proper dir in games when a new game is added to the platform.
