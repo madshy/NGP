@@ -1,0 +1,2 @@
+In this dir, every account has a dir called acc-dir and the name of this dir is same with the account's.
+At present, acc-dir only have a subdir named icon to store the icon of that account.
