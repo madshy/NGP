@@ -38,10 +38,6 @@ Database::Database(const QString &driver, const QString &host, int port,
 Database::~Database()
 {
 	/*or nullprt != query*/
-	if (query)
-	{
-		delete query;
-	}
 	disconnect();
 }
 
@@ -57,7 +53,6 @@ bool Database::connect()
 		qDebug() << err.text();
 		return false;
 	}
-	query = new QSqlQuery(db);
 	return true;
 }
 
@@ -69,31 +64,18 @@ bool Database::disconnect()
 }
 
 bool Database::insert(const QString &sql)
-{
-	if (!query)
-	{
-		qDebug() << "Connect before insert, calling connect() may be useful.";
-		return false;
-	}
-	
+{	
 	/*
 	Actually, so bad design.
 	*/
-	return query -> exec(sql);
+	return query.exec(sql);
 }
 
-QSqlQuery* Database::select(const QString &sql)
+QSqlQuery Database::select(const QString &sql)
 {
-	if (!query)
-	{
-		qDebug() << "Connect before select, calling connect() may be useful.";
-		return  nullptr;
-	}
-
 	/*note! may be leak memory.*/
-	QSqlQuery *temp = new QSqlQuery();
-	temp -> exec(sql);
-	return temp;
+	query.exec(sql);
+	return query;
 }
 
 void Database::init()

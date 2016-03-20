@@ -17,6 +17,7 @@
 #include <QtSql\qsqldatabase.h>
 #include <QtSql\qsqlerror.h>
 #include <QtCore/qstring.h>
+#include <qsqlquery.h>
 
 class Database{
 public:
@@ -35,14 +36,14 @@ public:
 	bool connect();
 	bool disconnect();
 	bool insert(const QString &sql);
-	QSqlQuery* select(const QString &sql);
+	QSqlQuery select(const QString &sql);
 	
 private:
 	void init();
 
 private:
 	QSqlDatabase db;
-	QSqlQuery* query;
+	QSqlQuery query;
 
 	QString driver;
 	QString host;
