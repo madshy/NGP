@@ -15,7 +15,6 @@
 
 #include <QtSql/qsql.h>
 #include <QtSql\qsqldatabase.h>
-#include <QtSql\qsqlquery.h>
 #include <QtSql\qsqlerror.h>
 #include <QtCore/qstring.h>
 
@@ -23,9 +22,9 @@ class Database{
 public:
 	/*ctors*/
 	Database();
-	Database(const QString &driver, const QString &host, int port,
-		const QString &user = QString("root"), const QString &password = QString("123456"),
-		const QString &dbName = QString("ngp"));
+	//Database(const QString &driver, const QString &host, int port,
+	//	const QString &user = QString("root"), const QString &password = QString("123456"),
+	//	const QString &dbName = QString("ngp"));
 	Database(const QString &driver, const QString &host, int port,
 		const QString &user, const QString &password,
 		const QString &dbName);
@@ -33,17 +32,17 @@ public:
 	~Database();
 
 public:
-	QSqlError connect();
+	bool connect();
 	bool disconnect();
 	bool insert(const QString &sql);
-	QSqlQuery select(const QString &sql);
+	QSqlQuery* select(const QString &sql);
 	
 private:
 	void init();
 
 private:
 	QSqlDatabase db;
-	QSqlQuery query;
+	QSqlQuery* query;
 
 	QString driver;
 	QString host;

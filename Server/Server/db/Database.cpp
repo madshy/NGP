@@ -5,61 +5,95 @@
 *    @mail:madshy@163.com
 *    @data:2016/03/20
 *    @comment:Implement of class Database.
+*Note to order of contruct between db and query.
+*That is query must be behind to db.
 *
 ***************************************************/
 
 #include "../include/Database.h"
+
+#include <QtCore\qdebug.h>
+#include <QtSql\qsqlquery.h>
 
 Database::Database()
 	:Database("QMYSQL", "127.0.0.1", 3306, "root", "123456", "ngp")
 {
 }
 
-Database::Database(const QString &driver, const QString &host, int port,
-	const QString &user = QString("root"), const QString &password = QString("123456"),
-	const QString &dbName = QString("ngp"))
-	: Database("QMYSQL", "127.0.0.1", 3306, user, password, dbName)
-{
-}
+//Database::Database(const QString &driver, const QString &host, int port,
+//	const QString &user = QString("root"), const QString &password = QString("123456"),
+//	const QString &dbName = QString("ngp"))
+//	: Database("QMYSQL", "127.0.0.1", 3306, user, password, dbName)
+//{
+//}
 
 Database::Database(const QString &driver, const QString &host, int port,
 	const QString &user, const QString &password,
 	const QString &dbName)
-	: driver(driver), host(host), port(port), user(user), password(password), dbName(dbName)
+	: driver(driver), host(host), port(port), user(user), password(password), dbName(dbName), query(nullptr)
 {
 	init();
 }
 
 Database::~Database()
 {
+	/*or nullprt != query*/
+	if (query)
+	{
+		delete query;
+	}
 	disconnect();
 }
 
-QSqlError Database::connect()
+bool Database::connect()
 {
 	QSqlError err;
+	/*
+	db.isOpen() almost make me die.
+	*/
 	if (!db.open())
 	{
 		err = db.lastError();
+		qDebug() << err.text();
+		return false;
 	}
-	return err;
+	query = new QSqlQuery(db);
+	return true;
 }
 
 bool Database::disconnect()
 {
 	if (db.isOpen())
 		db.close();
+	return true;
 }
 
 bool Database::insert(const QString &sql)
 {
-	return query.exec(sql);
+	if (!query)
+	{
+		qDebug() << "Connect before insert, calling connect() may be useful.";
+		return false;
+	}
+	
+	/*
+	Actually, so bad design.
+	*/
+	return query -> exec(sql);
 }
 
-QSqlQuery Database::select(const QString &sql)
+QSqlQuery* Database::select(const QString &sql)
 {
-	query.exec(sql);
-	return query;
+	if (!query)
+	{
+		qDebug() << "Connect before select, calling connect() may be useful.";
+		return  nullptr;
+	}
+
+	/*note! may be leak memory.*/
+	QSqlQuery *temp = new QSqlQuery();
+	temp -> exec(sql);
+	return temp;
 }
 
 void Database::init()
