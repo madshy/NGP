@@ -13,13 +13,14 @@
 #include "qdatastream.h"
 
 #include <qiodevice.h>
+#include <qcryptographichash.h>
 
 /*static membership*/
-QMap<QString, quint32> LoginServer::OnlineUserList;
-QMap<quint32, QString> LoginServer::OnlineHostList;
+QMap<QString, QSharedPointer<QTcpSocket>> LoginServer::OnlineUserList;
+QMap<quintptr, QString> LoginServer::OnlineHostList;
 
 LoginServer::LoginServer(const QHostAddress &addr, quint16 port)
-	:_addr(addr), _port(port)
+	:_addr(addr), _port(port), _server(nullptr)
 {
 	_server = new QTcpServer();
 	connect(_server, SIGNAL(newConnection()), this, SLOT(login()));
@@ -107,7 +108,13 @@ void LoginServer::Login::run()
 		QString sql("select * from user where user_id = '");
 
 		in >> user_id >> password;
-		sql += user_id + "' and password = '" + password + "'";
+
+		QString md5Psw;
+		QByteArray bytes;
+		bytes = QCryptographicHash::hash(password.toLatin1(), QCryptographicHash::Md5);
+		md5Psw.append(bytes.toHex());
+
+		sql += user_id + "' and password = '" + md5Psw + "'";
 		if (_db.connect())
 		{
 			QSqlQuery query = _db.select(sql);
@@ -125,6 +132,10 @@ void LoginServer::Login::run()
 				out << quint16(block.size() - sizeof(quint16));
 
 				tcpSocket.write(block);
+				
+				connect(&tcpSocket, SIGNAL(disconnected()), this, SLOT(logout()));
+				LoginServer::OnlineUserList.insert(user_id, QSharedPointer<QTcpSocket>(&tcpSocket));
+				LoginServer::OnlineHostList.insert(_sock, user_id);
 				return;
 			}	
 		}
@@ -161,6 +172,11 @@ void LoginServer::Login::run()
 		QString sql("insert into user values('");
 
 		in >> user_id >> password >> nation >> mail >> icon;
+
+		QString md5Psw;
+		QByteArray bytes;
+		bytes = QCryptographicHash::hash(password.toLatin1(), QCryptographicHash::Md5);
+		md5Psw.append(bytes.toHex());
 		
 		if (!_db.connect())
 		{
@@ -171,7 +187,7 @@ void LoginServer::Login::run()
 			return;
 		}
 
-		sql += user_id + "','" + password + "','" + nation + "','" + mail + "','" + icon + "')";
+		sql += user_id + "','" + md5Psw + "','" + nation + "','" + mail + "','" + icon + "')";
 		quint8 flag = _db.insert(sql) ? 'o' : 'n';
 		out << quint16(0) << flag;
 		out.device()->seek(0);
@@ -187,4 +203,17 @@ void LoginServer::Login::run()
 	}
 
 
+}
+
+void LoginServer::Login::logout()
+{
+	QTcpSocket *tcpSocket = qobject_cast<QTcpSocket*>(this->sender());
+	quintptr sock = tcpSocket->socketDescriptor();
+	delete tcpSocket;
+	QString user_id = LoginServer::OnlineHostList[sock];
+
+	LoginServer::OnlineUserList.remove(user_id);
+	LoginServer::OnlineHostList.remove(sock);
+
+	/*Broadcast to all.*/
 }

@@ -25,6 +25,7 @@
 #include <qsharedpointer.h>
 #include <qthread.h>
 #include <qhostaddress.h>
+#include <qsharedpointer.h>
 
 class LoginServer: public QThread
 {
@@ -52,12 +53,12 @@ public:
 	/*maybe need to synchronize*/
 	/*
 	QString is the name of account.
-	quint32 is the user's address, ipv4
+	quintptr is the user's socket descriptor
 	Actually, this two is the reverse of key and value each other.
 	and one host can login once not twice, same to user.
 	*/
-	static QMap<QString, quint32> OnlineUserList;
-	static QMap<quint32, QString> OnlineHostList;
+	static QMap<QString, QSharedPointer<QTcpSocket>> OnlineUserList;
+	static QMap<quintptr, QString> OnlineHostList;
 
 	/*Inner class*/
 protected:
@@ -79,7 +80,8 @@ protected:
 
 		/*slots*/
 		public slots:
-		void login();
+		virtual void login();
+		virtual void logout();
 
 		/*inherits*/
 	protected:
