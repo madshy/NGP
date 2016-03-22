@@ -54,6 +54,7 @@ void LoginServer::login()
 {
 	std::cout << "New connection......";
 	quintptr sock = _serverProxy->nextPendingConnection()->socketDescriptor();
+
 	/*new a Login, actually a thread to login*/
 	(new Login(this, sock, Database())) -> start();
 }

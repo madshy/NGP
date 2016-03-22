@@ -16,6 +16,7 @@
 #include "Database.h"
 
 #include <qthread.h>
+#include <qtcpsocket.h>
 
 /*Login manager.*/
 class Login : public QThread
@@ -26,6 +27,7 @@ class Login : public QThread
 private:
 	quintptr _sock;
 	Database _db;
+	QTcpSocket *_tcpSock;
 
 	/*ctors and dtors*/
 public:
@@ -36,6 +38,7 @@ public:
 	/*slots*/
 	public slots:
 	virtual void logout();
+	virtual void login();
 
 	/*inherits*/
 protected:

@@ -19,7 +19,8 @@
 #include <QtCore/qstring.h>
 #include <qsqlquery.h>
 
-class Database{
+class Database
+{
 public:
 	/*ctors*/
 	Database();
@@ -43,7 +44,7 @@ private:
 
 private:
 	QSqlDatabase db;
-	QSqlQuery query;
+	QSqlQuery* query;
 
 	QString driver;
 	QString host;

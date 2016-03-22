@@ -66,11 +66,6 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="include\Database.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
     <CustomBuild Include="include\LoginServer.h">
       <Filter>Generated Files</Filter>
     </CustomBuild>
@@ -78,6 +73,9 @@
       <Filter>Header Files</Filter>
     </CustomBuild>
     <CustomBuild Include="include\TcpServerProxy.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="include\Database.h">
       <Filter>Header Files</Filter>
     </CustomBuild>
   </ItemGroup>

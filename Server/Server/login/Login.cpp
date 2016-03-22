@@ -22,28 +22,33 @@
 Login::Login(QObject *parent, quintptr sock, const Database& db)
 	:QThread(parent), _sock(sock), _db(db)
 {
+	_tcpSock = new QTcpSocket();
+	_tcpSock->setSocketDescriptor(_sock);
+	connect(_tcpSock, SIGNAL(readyRead()), this, SLOT(login()));
 }
 
 Login::~Login()
 {
+	delete _tcpSock;
 }
 
 void Login::run()
 {
-	QTcpSocket tcpSocket;
-	tcpSocket.setSocketDescriptor(_sock);
+}
 
-	QDataStream in(&tcpSocket);
+void Login::login()
+{
+	QDataStream in(_tcpSock);
 	in.setVersion(QDataStream::Qt_5_6);
 
 	/*Error occur.*/
-	if (tcpSocket.bytesAvailable() <= sizeof(quint16))
+	if (_tcpSock -> bytesAvailable() <= sizeof(quint16))
 	{
 		return;
 	}
 	quint16 blockSize;
 	in >> blockSize;
-	if (tcpSocket.bytesAvailable() <= blockSize)
+	if (_tcpSock->bytesAvailable() < blockSize)
 	{
 		return;
 	}
@@ -95,10 +100,10 @@ void Login::run()
 				out.device()->seek(0);
 				out << quint16(block.size() - sizeof(quint16));
 
-				tcpSocket.write(block);
+				_tcpSock->write(block);
 
-				connect(&tcpSocket, SIGNAL(disconnected()), this, SLOT(logout()));
-				LoginServer::OnlineUserList.insert(user_id, QSharedPointer<QTcpSocket>(&tcpSocket));
+				connect(_tcpSock, SIGNAL(disconnected()), this, SLOT(logout()));
+				LoginServer::OnlineUserList.insert(user_id, QSharedPointer<QTcpSocket>(_tcpSock));
 				LoginServer::OnlineHostList.insert(_sock, user_id);
 				return;
 			}
@@ -112,7 +117,7 @@ void Login::run()
 			out << quint16(0) << quint8('n');
 			out.device()->seek(0);
 			out << quint16(block.size() - sizeof(quint16));
-			tcpSocket.write(block);
+			_tcpSock->write(block);
 			return;
 		}
 	}
@@ -147,16 +152,17 @@ void Login::run()
 			out << quint16(0) << quint8('n');
 			out.device()->seek(0);
 			out << quint16(block.size() - sizeof(quint16));
-			tcpSocket.write(block);
+			_tcpSock->write(block);
 			return;
 		}
 
 		sql += user_id + "','" + md5Psw + "','" + nation + "','" + mail + "','" + icon + "')";
+		qDebug() << sql;
 		quint8 flag = _db.insert(sql) ? 'o' : 'n';
 		out << quint16(0) << flag;
 		out.device()->seek(0);
 		out << quint16(block.size() - sizeof(quint16));
-		tcpSocket.write(block);
+		_tcpSock->write(block);
 		return;
 
 	}
