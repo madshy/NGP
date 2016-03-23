@@ -38,6 +38,9 @@ public:
 	bool disconnect();
 	bool insert(const QString &sql);
 	QSqlQuery select(const QString &sql);
+
+	/*To get a database connection by it's name.*/
+	QString getConnName();
 	
 private:
 	void init();
@@ -52,6 +55,13 @@ private:
 	QString	user;
 	QString password;
 	QString	dbName;
+
+	/*To identify a database connection*/
+	QString connName;
+
+private:
+	/*A flag to distinguish database.Actually, it's a postfix of db's name.*/
+	static unsigned int flag;
 };
 
 #endif

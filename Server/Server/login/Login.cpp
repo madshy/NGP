@@ -25,6 +25,7 @@ Login::Login(QObject *parent, quintptr sock, const Database& db)
 	_tcpSock = new QTcpSocket();
 	_tcpSock->setSocketDescriptor(_sock);
 	connect(_tcpSock, SIGNAL(readyRead()), this, SLOT(login()));
+	connect(_tcpSock, SIGNAL(disconnected()), this, SLOT(logout()));
 }
 
 Login::~Login()
@@ -102,7 +103,7 @@ void Login::login()
 
 				_tcpSock->write(block);
 
-				connect(_tcpSock, SIGNAL(disconnected()), this, SLOT(logout()));
+				//connect(_tcpSock, SIGNAL(disconnected()), this, SLOT(logout()));
 				LoginServer::OnlineUserList.insert(user_id, QSharedPointer<QTcpSocket>(_tcpSock));
 				LoginServer::OnlineHostList.insert(_sock, user_id);
 				return;
@@ -177,7 +178,7 @@ void Login::logout()
 {
 	QTcpSocket *tcpSocket = qobject_cast<QTcpSocket*>(this->sender());
 	quintptr sock = tcpSocket->socketDescriptor();
-	delete tcpSocket;
+	//delete tcpSocket;
 	QString user_id = LoginServer::OnlineHostList[sock];
 
 	LoginServer::OnlineUserList.remove(user_id);

@@ -31,7 +31,7 @@ private:
 
 	/*ctors and dtors*/
 public:
-	Login(QObject *, quintptr, const Database&);
+	Login(QObject *, quintptr, const QString &);
 
 	~Login();
 
