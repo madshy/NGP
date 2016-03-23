@@ -26,7 +26,7 @@ class Login : public QThread
 		/*memberships*/
 private:
 	quintptr _sock;
-	Database _db;
+	QSqlDatabase _db;
 	QTcpSocket *_tcpSock;
 
 	/*ctors and dtors*/

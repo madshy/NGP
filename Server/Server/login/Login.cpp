@@ -19,8 +19,8 @@
 
 
 
-Login::Login(QObject *parent, quintptr sock, const Database& db)
-	:QThread(parent), _sock(sock), _db(db)
+Login::Login(QObject *parent, quintptr sock, const QString& connName)
+	:QThread(parent), _sock(sock), _db(QSqlDatabase::database(connName))
 {
 	_tcpSock = new QTcpSocket();
 	_tcpSock->setSocketDescriptor(_sock);
@@ -62,6 +62,13 @@ void Login::login()
 	QDataStream out(&block, QIODevice::WriteOnly);
 	out.setVersion(QDataStream::Qt_5_6);
 
+	if (!_db.open())
+	{
+		qDebug() << _db.lastError().text();
+		return;
+	}
+
+	QSqlQuery query(_db);
 	/*login*/
 	switch (requestType)
 	{
@@ -85,9 +92,9 @@ void Login::login()
 		md5Psw.append(bytes.toHex());
 
 		sql += user_id + "' and password = '" + md5Psw + "'";
-		if (_db.connect())
+		if (_db.isOpen())
 		{
-			QSqlQuery query = _db.select(sql);
+			query.exec(sql);
 			if (query.next())
 			{
 				/*
@@ -109,18 +116,16 @@ void Login::login()
 				return;
 			}
 		}
-		else
-		{
-			/*
-			Login fail reply format:
-			blockSize + flag.
-			*/
-			out << quint16(0) << quint8('n');
-			out.device()->seek(0);
-			out << quint16(block.size() - sizeof(quint16));
-			_tcpSock->write(block);
-			return;
-		}
+
+		/*
+		Login fail reply format:
+		blockSize + flag.
+		*/
+		out << quint16(0) << quint8('n');
+		out.device()->seek(0);
+		out << quint16(block.size() - sizeof(quint16));
+		_tcpSock->write(block);
+		return;
 	}
 
 	/*
@@ -148,7 +153,7 @@ void Login::login()
 		bytes = QCryptographicHash::hash(password.toLatin1(), QCryptographicHash::Md5);
 		md5Psw.append(bytes.toHex());
 
-		if (!_db.connect())
+		if (!_db.isOpen())
 		{
 			out << quint16(0) << quint8('n');
 			out.device()->seek(0);
@@ -158,14 +163,15 @@ void Login::login()
 		}
 
 		sql += user_id + "','" + md5Psw + "','" + nation + "','" + mail + "','" + icon + "')";
-		qDebug() << sql;
-		quint8 flag = _db.insert(sql) ? 'o' : 'n';
+
+		query.exec(sql);
+
+		quint8 flag = query.numRowsAffected() >= 1 ? 'o' : 'n';
 		out << quint16(0) << flag;
 		out.device()->seek(0);
 		out << quint16(block.size() - sizeof(quint16));
 		_tcpSock->write(block);
 		return;
-
 	}
 
 	/*default, not defined at present.*/
