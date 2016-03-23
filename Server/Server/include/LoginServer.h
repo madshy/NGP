@@ -15,6 +15,7 @@
 #define LOGINSERVER_H
 
 #include "Database.h"
+#include "TcpServerProxy.h"
 
 #include <qtcpserver.h>
 #include <qtcpsocket.h>
@@ -25,8 +26,8 @@
 #include <qsharedpointer.h>
 #include <qthread.h>
 #include <qhostaddress.h>
-#include <qsharedpointer.h>
 
+/*Port of this server is 1994*/
 class LoginServer: public QThread
 {
 	Q_OBJECT
@@ -34,12 +35,15 @@ class LoginServer: public QThread
 private:
 	QHostAddress _addr;
 	quint16 _port;
-	QTcpServer* _server;
+	TcpServerProxy* _serverProxy;
 
 	/*ctors and dtors*/
 public:
-	LoginServer(const QHostAddress&, quint16);
+	LoginServer(QObject *parent, const QHostAddress&, quint16);
 	~LoginServer();
+
+signals:
+	void listenEmit(const QString&, quint16);
 
 protected slots:
 	/*slots*/
@@ -59,34 +63,6 @@ public:
 	*/
 	static QMap<QString, QSharedPointer<QTcpSocket>> OnlineUserList;
 	static QMap<quintptr, QString> OnlineHostList;
-
-	/*Inner class*/
-protected:
-	/*Login manager.*/
-	class Login : public QThread
-	{
-		Q_OBJECT
-	
-		/*memberships*/
-	private:
-		quintptr _sock;
-		Database _db;
-
-		/*ctors and dtors*/
-	public:
-		Login(quintptr, const Database&);
-
-		~Login();
-
-		/*slots*/
-		public slots:
-		virtual void login();
-		virtual void logout();
-
-		/*inherits*/
-	protected:
-		void run();
-	};
 };
 
 #endif

@@ -34,5 +34,4 @@ void test()
 		qDebug() << "id:" << query->value(0).toInt();
 		qDebug() << "name:" << query->value("name").toString();
 	}
-
 }

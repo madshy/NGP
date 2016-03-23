@@ -15,78 +15,37 @@
 #include <QtCore\qdebug.h>
 #include <QtSql\qsqlquery.h>
 
-Database::Database()
-	:Database("QMYSQL", "127.0.0.1", 3306, "root", "123456", "ngp")
-{
-}
-
-//Database::Database(const QString &driver, const QString &host, int port,
-//	const QString &user = QString("root"), const QString &password = QString("123456"),
-//	const QString &dbName = QString("ngp"))
-//	: Database("QMYSQL", "127.0.0.1", 3306, user, password, dbName)
-//{
-//}
+unsigned int Database::_flag = 1;
 
 Database::Database(const QString &driver, const QString &host, int port,
 	const QString &user, const QString &password,
 	const QString &dbName)
-	: driver(driver), host(host), port(port), user(user), password(password), dbName(dbName), query(nullptr)
+	:_driver(driver), _host(host), _port(port), _user(user),
+	_password(password), _dbName(dbName), _connName("")
 {
+	_connName += QString("db_id_%1").arg(_flag);
 	init();
+	++_flag;
 }
 
 Database::~Database()
 {
-	/*or nullprt != query*/
-	disconnect();
 }
 
-bool Database::connect()
+QString Database::getConnName()
 {
-	QSqlError err;
-	/*
-	db.isOpen() almost make me die.
-	*/
-	if (!db.open())
-	{
-		err = db.lastError();
-		qDebug() << err.text();
-		return false;
-	}
-	return true;
-}
-
-bool Database::disconnect()
-{
-	if (db.isOpen())
-		db.close();
-	return true;
-}
-
-bool Database::insert(const QString &sql)
-{	
-	/*
-	Actually, so bad design.
-	*/
-	return query.exec(sql);
-}
-
-QSqlQuery Database::select(const QString &sql)
-{
-	/*note! may be leak memory.*/
-	query.exec(sql);
-	return query;
+	return _connName;
 }
 
 void Database::init()
 {
 	/*get database*/
-	db = QSqlDatabase::addDatabase(driver);
+	QSqlDatabase db = QSqlDatabase::addDatabase(_driver, _connName);
 
 	/*set info*/
-	db.setHostName(host);
-	db.setPort(port);
-	db.setUserName(user);
-	db.setPassword(password);
-	db.setDatabaseName(dbName);
+	db.setHostName(_host);
+	db.setPort(_port);
+	db.setUserName(_user);
+	db.setPassword(_password);
+	db.setDatabaseName(_dbName);
 }
