@@ -1,0 +1,19 @@
+﻿CloseButton
+{
+    background-image: url(:/images/close1.png);
+}
+
+CloseButton:hover
+{
+	background-image: url(:/images/close2.png);
+}
+
+MinimizeButton 
+{
+	background-image: url(:/images/minimize1.png);
+}
+
+MinimizeButton:hover
+{
+    background-image: url(:/images/minimize2.png);
+}

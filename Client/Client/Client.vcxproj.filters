@@ -24,12 +24,12 @@
       <SourceControlFiles>False</SourceControlFiles>
     </Filter>
     <Filter Include="Generated Files\Debug">
-      <UniqueIdentifier>{b47527b9-0dd8-4e04-978a-9b95bb386cb4}</UniqueIdentifier>
+      <UniqueIdentifier>{762e3677-24de-4a7c-91e4-c5f208a2c03c}</UniqueIdentifier>
       <Extensions>cpp;moc</Extensions>
       <SourceControlFiles>False</SourceControlFiles>
     </Filter>
     <Filter Include="Generated Files\Release">
-      <UniqueIdentifier>{c502ffad-cabc-489d-a047-9cf36a8e50c6}</UniqueIdentifier>
+      <UniqueIdentifier>{c76c2f87-7ddc-4030-becc-1397ca62ab99}</UniqueIdentifier>
       <Extensions>cpp;moc</Extensions>
       <SourceControlFiles>False</SourceControlFiles>
     </Filter>
@@ -38,33 +38,49 @@
     <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="client.cpp">
+    <ClCompile Include="GeneratedFiles\Debug\qrc_resource.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="GeneratedFiles\Debug\moc_client.cpp">
+    <ClCompile Include="GeneratedFiles\Debug\moc_CloseButton.cpp">
       <Filter>Generated Files\Debug</Filter>
     </ClCompile>
-    <ClCompile Include="GeneratedFiles\Release\moc_client.cpp">
+    <ClCompile Include="GeneratedFiles\Release\moc_CloseButton.cpp">
       <Filter>Generated Files\Release</Filter>
     </ClCompile>
-    <ClCompile Include="GeneratedFiles\qrc_client.cpp">
-      <Filter>Generated Files</Filter>
+    <ClCompile Include="custom\CloseButton.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_MinimizeButton.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_MinimizeButton.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="custom\MinimizeButton.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_LoginUI.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_LoginUI.cpp">
+      <Filter>Generated Files\Release</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <CustomBuild Include="client.h">
+    <CustomBuild Include="Resources\resource.qrc">
+      <Filter>Resource Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="include\CloseButton.h">
       <Filter>Header Files</Filter>
     </CustomBuild>
-    <CustomBuild Include="client.ui">
-      <Filter>Form Files</Filter>
+    <CustomBuild Include="include\MinimizeButton.h">
+      <Filter>Header Files</Filter>
     </CustomBuild>
-    <CustomBuild Include="client.qrc">
-      <Filter>Resource Files</Filter>
+    <CustomBuild Include="include\LoginUI.h">
+      <Filter>Header Files</Filter>
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="GeneratedFiles\ui_client.h">
-      <Filter>Generated Files</Filter>
-    </ClInclude>
+    <None Include="styles\style.css" />
   </ItemGroup>
 </Project>
