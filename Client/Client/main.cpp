@@ -1,24 +1,26 @@
 #include <QtWidgets/QApplication>
-#include <qdockwidget.h>
+#include <qfile.h>
+#include <qstring.h>
 
-#include "tests/test_CloseAndMinButton.h"
+#include "../include/LoginUI.h"
+
 #include <qwidget.h>
-#include <qlabel.h>
+#include <qlineedit.h>
 
 int main(int argc, char *argv[])
 {
 	QApplication a(argc, argv);
 
-	//Widget w;
-	//w.setStyleSheet("QPushButton{background-image : url(':/images/ccc.jpg')}");
-	//w.setWindowFlags(Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint);
-	//QDockWidget *dockWidget = new QDockWidget("Dock", &w, Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint);
-	//dockWidget->setFloating(false);
-	//w.addDockWidget(Qt::LeftDockWidgetArea, dockWidget);
-	//w.show();
+	//LoginUI loginUI;
+	QWidget loginUI;
+	QLineEdit line(&loginUI);
 
-	TestCloseAndMinButton test;
-	test.show();
+	QFile file(":/styles/style.css");
+	file.open(QFile::ReadOnly);
+	QString styleSheet = QObject::tr(file.readAll());
+	loginUI.setStyleSheet(styleSheet);
+
+	loginUI.show();
 
 	return a.exec();
 }

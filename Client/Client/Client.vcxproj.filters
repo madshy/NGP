@@ -65,6 +65,9 @@
     <ClCompile Include="GeneratedFiles\Release\moc_LoginUI.cpp">
       <Filter>Generated Files\Release</Filter>
     </ClCompile>
+    <ClCompile Include="ui\LoginUI.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="Resources\resource.qrc">

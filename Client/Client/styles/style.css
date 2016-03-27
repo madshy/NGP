@@ -1,4 +1,5 @@
-﻿CloseButton
+﻿/*CloseButton*/
+CloseButton
 {
     background-image: url(:/images/close1.png);
 }
@@ -8,6 +9,7 @@ CloseButton:hover
 	background-image: url(:/images/close2.png);
 }
 
+/*MinimizeButton*/
 MinimizeButton 
 {
 	background-image: url(:/images/minimize1.png);
@@ -16,4 +18,42 @@ MinimizeButton
 MinimizeButton:hover
 {
     background-image: url(:/images/minimize2.png);
+}
+
+/*LineEdit style*/
+QLineEdit
+{
+    background-color: #1e1e1e;
+    color: white;
+    width: 999px;
+    height: 80px;
+}
+
+QLineEdit:hover
+{
+    background-color: #1e1e1e;
+    color: white;
+    width: 999px;
+    height: 80px;
+}
+
+/*QLineEdit:!hover
+{
+    background-color: #1e1e1e;
+    color: white;
+}*/
+
+
+QPushButton#loginBtn
+{
+    background-color: yellowgreen;
+    border-width: 0px;
+    border-radius: 10;
+}
+
+QPushButton#loginBtn:hover
+{
+    background-color: green;
+    border-width: 0px;
+    border-radius: 10;
 }

@@ -17,9 +17,10 @@
 
 /*forward declaration*/
 class QLabel;
+class CloseButton;
+class MinimizeButton;
 class QPushButton;
 class QLineEdit;
-class QCheckBox;
 
 /*Login window class*/
 class LoginUI : public QWidget
@@ -27,14 +28,29 @@ class LoginUI : public QWidget
 	Q_OBJECT
 
 private:
-	QLabel *iconLabel;		/*show icon*/
+	QLabel *_iconLabel;			/*show icon*/
+	QLabel *_errLabel;			/*show if cannot login.*/
 
-	QPushButton *minBtn;	/*minimize the UI*/
-	QPushButton *closeBtn;	/*close the UI*/
-	QPushButton *loginBtn;	/*login after inputing login info*/
+	MinimizeButton *_minBtn;	/*minimize the UI*/
+	CloseButton *_closeBtn;		/*close the UI*/
+	QPushButton *_registerBtn;	/*login after inputing login info*/
+	QPushButton *_retrievePsw;	/*retrieve the password if forgot it.*/
+	QPushButton *_loginBtn;		/*begin to login after filled in info.*/
 
+	QLineEdit *_idEdit;			/*for inputting user id.*/
+	QLineEdit *_pswEdit;		/*for inputting user password.*/
+
+	/*ctors and dtors*/
+public:
+	LoginUI(QWidget *parent = Q_NULLPTR);
+	~LoginUI();
+
+	protected slots:
+	/*called when _loginBtn clicked.*/
+	void login();
+	/*called when _registerBtn clicked.*/
+	void reg();
 };
 
 
 #endif
-
