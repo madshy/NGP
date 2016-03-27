@@ -27,9 +27,32 @@
 /*Other header*/
 #include <qtcpsocket.h>
 #include <qstring.h>
+#include <qdatastream.h>
+#include <qbytearray.h>
+#include <qhostaddress.h>
 
 LoginUI::LoginUI(QWidget *parent)
-	:QWidget(parent)
+	:QWidget(parent), _loginFlag(false)
+{
+	initNet();
+	initUI();
+
+	/*connect the signals and slots*/
+	connect(_closeBtn, SIGNAL(clicked()), this, SLOT(close()));
+	connect(_minBtn, SIGNAL(clicked()), this, SLOT(showMinimized()));
+	connect(_registerBtn, SIGNAL(clicked()), this, SLOT(reg()));
+	connect(_retrievePsw, SIGNAL(clicked()), this, SLOT(retrieve()));
+	connect(_loginBtn, SIGNAL(clicked()), this, SLOT(login()));
+	connect(this, SIGNAL(flagOkToRead()), this, SLOT(result()));
+	connect(_idEdit, SIGNAL(textChanded(const QString&)), this, SLOT(hideErrLabel(const QString&)));
+	connect(_pswEdit, SIGNAL(textChanded(const QString&)), this, SLOT(hideErrLabel(const QString&)));
+}
+
+LoginUI::~LoginUI()
+{
+}
+
+void LoginUI::initUI()
 {
 	/*Fixed the size*/
 	setMaximumSize(500, 250);
@@ -93,6 +116,11 @@ LoginUI::LoginUI(QWidget *parent)
 	_loginBtn->setFixedHeight(45);
 	_errLabel->setFixedHeight(25);
 	_errLabel->setHidden(true);
+
+	QHBoxLayout *errLabelLayout = new QHBoxLayout;
+	errLabelLayout->addWidget(_errLabel);
+	errLabelLayout->addSpacing(30);
+
 	QHBoxLayout *loginBtnLayout = new QHBoxLayout;
 	loginBtnLayout->addWidget(_loginBtn);
 	loginBtnLayout->addSpacing(30);
@@ -101,7 +129,7 @@ LoginUI::LoginUI(QWidget *parent)
 	QGridLayout *loginFieldLayout = new QGridLayout;
 	loginFieldLayout->addLayout(idLayout, 0, 0);
 	loginFieldLayout->addLayout(pswLayout, 1, 0);
-	loginFieldLayout->addWidget(_errLabel, 2, 0);
+	loginFieldLayout->addLayout(errLabelLayout, 2, 0);
 	loginFieldLayout->addLayout(loginBtnLayout, 3, 0);
 	loginFieldLayout->setMargin(30);
 
@@ -122,24 +150,100 @@ LoginUI::LoginUI(QWidget *parent)
 	setWindowFlags(Qt::FramelessWindowHint);
 
 	_loginBtn->setObjectName("loginBtn");
+	_errLabel->setObjectName("errLabel");
 
 	/*To eliminate the bug flushing on QLineEdit*/
 	_pswEdit->setFrame(false);
 	_idEdit->setFrame(false);
 
-	/*connect the signals and slots*/
-	connect(_closeBtn, SIGNAL(clicked()), this, SLOT(close()));
-	connect(_minBtn, SIGNAL(clicked()), this, SLOT(showMinimized()));
+
 }
 
-LoginUI::~LoginUI()
+void LoginUI::initNet()
 {
+	/*init the connection.*/
+	_tcpSocket = new QTcpSocket();
+	if (!_tcpSocket->bind(QHostAddress("127.0.0.1"), 1995))
+	{
+		qDebug() << "Failed to bind.";
+		return;
+	}
+
+	_tcpSocket->connectToHost(QHostAddress("127.0.0.1"), 1994);
 }
 
 void LoginUI::login()
 {
+	connect(_tcpSocket, SIGNAL(readyRead()), this, SLOT(readInfo()));
+
+	QString id = _idEdit->text();
+	QString psw = _pswEdit->text();
+
+	QByteArray block;
+	QDataStream out(&block, QIODevice::WriteOnly);
+	out.setVersion(QDataStream::Qt_5_6);
+
+	out << quint16(0) << quint8('l') << id << psw;
+	out.device()->seek(0);
+	out << quint16(block.size() - sizeof(quint16));
+	_tcpSocket->write(block);
 }
 
 void LoginUI::reg()
 {
+
+}
+
+void LoginUI::retrieve()
+{
+
+}
+
+void LoginUI::readInfo()
+{
+	disconnect(_tcpSocket, SIGNAL(readyRead()), this, SLOT(readInfo()));
+
+	_loginFlag = false;
+
+	QDataStream in(_tcpSocket);
+	in.setVersion(QDataStream::Qt_5_6);
+
+	quint16 blockSize;
+	if (_tcpSocket->bytesAvailable() <= sizeof(quint16))
+	{
+		qDebug() << "Error size of block.";
+		emit flagOkToRead();
+		return;
+	}
+
+	in >> blockSize;
+	if (_tcpSocket->bytesAvailable() < blockSize)
+	{
+		qDebug() << "No info in block.";
+		emit flagOkToRead();
+		return;
+	}
+
+	quint8 flag;
+	in >> flag;
+
+	_loginFlag = flag == 'o';
+	emit flagOkToRead();
+}
+
+void LoginUI::result()
+{
+	if (!_loginFlag)/*Failed.*/
+	{
+		_errLabel->show();
+	}
+	else/*Ok to login and go to logined ui.*/
+	{
+
+	}
+}
+
+void LoginUI::hideErrLabel(const QString&)
+{
+	_errLabel->setHidden(true);
 }

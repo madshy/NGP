@@ -21,6 +21,8 @@ class CloseButton;
 class MinimizeButton;
 class QPushButton;
 class QLineEdit;
+class QTcpSocket;
+class QString;
 
 /*Login window class*/
 class LoginUI : public QWidget
@@ -40,6 +42,19 @@ private:
 	QLineEdit *_idEdit;			/*for inputting user id.*/
 	QLineEdit *_pswEdit;		/*for inputting user password.*/
 
+	QTcpSocket *_tcpSocket;		/*hold on a connection to server.*/
+
+	bool _loginFlag;				/*true means login ok and false means failed.*/
+
+private:
+	/*Initialize the UI components.*/
+	void initUI();
+	/*Initialize the network*/
+	void initNet();
+
+signals:
+	void flagOkToRead();
+
 	/*ctors and dtors*/
 public:
 	LoginUI(QWidget *parent = Q_NULLPTR);
@@ -50,6 +65,14 @@ public:
 	void login();
 	/*called when _registerBtn clicked.*/
 	void reg();
+	/*called when _retrieveBtn clicked.*/
+	void retrieve();
+	/*called when _tcpSocket is ready to be read.*/
+	void readInfo();
+	/*called when signal flagOkToRead emited.*/
+	void result();
+	/*called when need to hide error label.*/
+	void hideErrLabel(const QString &);
 };
 
 

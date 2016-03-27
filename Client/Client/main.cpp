@@ -13,7 +13,7 @@ int main(int argc, char *argv[])
 
 	LoginUI loginUI;
 
-	QFile file(":/styles/style.css");
+	QFile file(":/styles/loginStyle.css");
 	file.open(QFile::ReadOnly);
 	QString styleSheet = QObject::tr(file.readAll());
 	loginUI.setStyleSheet(styleSheet);

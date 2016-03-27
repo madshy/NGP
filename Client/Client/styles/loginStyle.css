@@ -40,3 +40,9 @@ QPushButton#loginBtn:hover
     border-width: 0px;
     border-radius: 10;
 }
+
+QLabel#errLabel
+{
+    background-color: #1e1e1e;
+    color: red;
+}

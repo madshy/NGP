@@ -84,6 +84,6 @@
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
-    <None Include="styles\style.css" />
+    <None Include="styles\loginStyle.css" />
   </ItemGroup>
 </Project>

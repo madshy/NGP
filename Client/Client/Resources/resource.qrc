@@ -6,6 +6,6 @@
         <file alias="minimize2.png">../images/common/minimize2.png</file>
     </qresource>
     <qresource prefix="/styles">
-        <file alias="style.css">../styles/style.css</file>
+        <file alias="loginStyle.css">../styles/loginStyle.css</file>
     </qresource>
 </RCC>
