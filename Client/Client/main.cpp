@@ -11,9 +11,7 @@ int main(int argc, char *argv[])
 {
 	QApplication a(argc, argv);
 
-	//LoginUI loginUI;
-	QWidget loginUI;
-	QLineEdit line(&loginUI);
+	LoginUI loginUI;
 
 	QFile file(":/styles/style.css");
 	file.open(QFile::ReadOnly);

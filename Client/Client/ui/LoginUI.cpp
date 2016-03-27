@@ -68,7 +68,6 @@ LoginUI::LoginUI(QWidget *parent)
 
 	_idEdit->setFont(QFont("Times", 12));
 	_idEdit->setPlaceholderText("account");
-	_idEdit->setStyleSheet("{background-color: #1e1e1e; color: white;}");
 
 	/*Retrieve and password input widget*/
 	_retrievePsw = new QPushButton;
@@ -123,6 +122,10 @@ LoginUI::LoginUI(QWidget *parent)
 	setWindowFlags(Qt::FramelessWindowHint);
 
 	_loginBtn->setObjectName("loginBtn");
+
+	/*To eliminate the bug flushing on QLineEdit*/
+	_pswEdit->setFrame(false);
+	_idEdit->setFrame(false);
 
 	/*connect the signals and slots*/
 	connect(_closeBtn, SIGNAL(clicked()), this, SLOT(close()));

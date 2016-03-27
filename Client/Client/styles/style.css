@@ -25,24 +25,7 @@ QLineEdit
 {
     background-color: #1e1e1e;
     color: white;
-    width: 999px;
-    height: 80px;
 }
-
-QLineEdit:hover
-{
-    background-color: #1e1e1e;
-    color: white;
-    width: 999px;
-    height: 80px;
-}
-
-/*QLineEdit:!hover
-{
-    background-color: #1e1e1e;
-    color: white;
-}*/
-
 
 QPushButton#loginBtn
 {
