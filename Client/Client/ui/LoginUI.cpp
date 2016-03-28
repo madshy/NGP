@@ -19,6 +19,7 @@
 /*Custom Widget header*/
 #include "../include/CloseButton.h"
 #include "../include/MinimizeButton.h"
+#include "../include/InfoEdit.h"
 
 /*Qt Layout header*/
 #include <qboxlayout.h>
@@ -44,8 +45,8 @@ LoginUI::LoginUI(QWidget *parent)
 	connect(_retrievePsw, SIGNAL(clicked()), this, SLOT(retrieve()));
 	connect(_loginBtn, SIGNAL(clicked()), this, SLOT(login()));
 	connect(this, SIGNAL(flagOkToRead()), this, SLOT(result()));
-	connect(_idEdit, SIGNAL(textChanded(const QString&)), this, SLOT(hideErrLabel(const QString&)));
-	connect(_pswEdit, SIGNAL(textChanded(const QString&)), this, SLOT(hideErrLabel(const QString&)));
+	connect(_idEdit, SIGNAL(focusGot()), this, SLOT(hideErrLabel()));
+	connect(_pswEdit, SIGNAL(focusGot()), this, SLOT(hideErrLabel()));
 }
 
 LoginUI::~LoginUI()
@@ -77,7 +78,7 @@ void LoginUI::initUI()
 
 	/*Register button and id input widget*/
 	_registerBtn = new QPushButton;
-	_idEdit = new QLineEdit;
+	_idEdit = new InfoEdit;
 	_registerBtn->setFixedSize(30, 30);
 	_registerBtn->setFlat(true);
 	_idEdit->setFixedHeight(30);
@@ -94,7 +95,7 @@ void LoginUI::initUI()
 
 	/*Retrieve and password input widget*/
 	_retrievePsw = new QPushButton;
-	_pswEdit = new QLineEdit;
+	_pswEdit = new InfoEdit;
 	_retrievePsw->setFixedSize(30, 30);
 	_retrievePsw->setFlat(true);
 	_pswEdit->setFixedHeight(30);
@@ -243,7 +244,7 @@ void LoginUI::result()
 	}
 }
 
-void LoginUI::hideErrLabel(const QString&)
+void LoginUI::hideErrLabel()
 {
 	_errLabel->setHidden(true);
 }

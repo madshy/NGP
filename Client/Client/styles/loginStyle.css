@@ -21,22 +21,29 @@ MinimizeButton:hover
 }
 
 /*LineEdit style*/
-QLineEdit
+InfoEdit
 {
     background-color: #1e1e1e;
     color: white;
 }
 
-QPushButton#loginBtn
+QPushButton#loginBtn:disabled
 {
-    background-color: yellowgreen;
+    background-image: url(:/images/login0.png);
+    border-width: 0px;
+    border-radius: 10;
+}
+
+QPushButton#loginBtn 
+{
+    background-image: url(:/images/login1.png);
     border-width: 0px;
     border-radius: 10;
 }
 
 QPushButton#loginBtn:hover
 {
-    background-color: green;
+    background-image: url(:/images/login2.png);
     border-width: 0px;
     border-radius: 10;
 }

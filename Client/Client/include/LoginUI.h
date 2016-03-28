@@ -20,7 +20,7 @@ class QLabel;
 class CloseButton;
 class MinimizeButton;
 class QPushButton;
-class QLineEdit;
+class InfoEdit;
 class QTcpSocket;
 class QString;
 
@@ -39,8 +39,8 @@ private:
 	QPushButton *_retrievePsw;	/*retrieve the password if forgot it.*/
 	QPushButton *_loginBtn;		/*begin to login after filled in info.*/
 
-	QLineEdit *_idEdit;			/*for inputting user id.*/
-	QLineEdit *_pswEdit;		/*for inputting user password.*/
+	InfoEdit *_idEdit;			/*for inputting user id.*/
+	InfoEdit *_pswEdit;		/*for inputting user password.*/
 
 	QTcpSocket *_tcpSocket;		/*hold on a connection to server.*/
 
@@ -72,7 +72,7 @@ public:
 	/*called when signal flagOkToRead emited.*/
 	void result();
 	/*called when need to hide error label.*/
-	void hideErrLabel(const QString &);
+	void hideErrLabel();
 };
 
 
