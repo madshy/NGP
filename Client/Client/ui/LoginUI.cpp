@@ -152,6 +152,10 @@ void LoginUI::initUI()
 
 	_loginBtn->setObjectName("loginBtn");
 	_errLabel->setObjectName("errLabel");
+	_registerBtn->setObjectName("registerBtn");
+	_retrievePsw->setObjectName("retrieveBtn");
+	_retrievePsw->setToolTip("Retrieve the password");
+	_registerBtn->setToolTip("Register the account");
 
 	/*To eliminate the bug flushing on QLineEdit*/
 	_pswEdit->setFrame(false);
