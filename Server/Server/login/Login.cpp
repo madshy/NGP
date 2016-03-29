@@ -99,12 +99,12 @@ void Login::login()
 			{
 				/*
 				Login success reply format:
-				blockSize + flag + nation + icon.
+				blockSize + flag + user_id + nation + icon.
 				*/
 				QString nation = query.value("nation").toString();
 				QString icon = query.value("icon").toString();
 
-				out << quint16(0) << quint8('o') << nation << icon;
+				out << quint16(0) << quint8('o') << user_id << nation << icon;
 				out.device()->seek(0);
 				out << quint16(block.size() - sizeof(quint16));
 
