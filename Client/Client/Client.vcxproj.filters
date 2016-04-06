@@ -111,4 +111,9 @@
     <None Include="styles\loginStyle.css" />
     <None Include="styles\registerStyle.css" />
   </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="include\MainUI.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
 </Project>

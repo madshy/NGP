@@ -387,7 +387,7 @@ void RegisterUI::checkId()
 	if (-1 == regExp.indexIn(_idEdit->text()))
 	{
 		QString text =
-			'0' == _idEdit->text().at(0) ?
+			"" != _idEdit->text() && '0' == _idEdit->text().at(0) ?
 			QString::fromLocal8Bit("不能以0开头") :
 			QString::fromLocal8Bit("5-11个字母或数字");
 
