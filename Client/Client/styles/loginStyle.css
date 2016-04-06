@@ -1,0 +1,83 @@
+﻿QFrame#frame
+{
+    background-image: url(:/images/bg.png);
+}
+
+/*CloseButton*/
+CloseButton
+{
+    background-image: url(:/images/close1.png);
+}
+
+CloseButton:hover
+{
+	background-image: url(:/images/close2.png);
+}
+
+CloseButton:pressed
+{
+	background-image: url(:/images/close2.png);
+}
+
+/*MinimizeButton*/
+MinimizeButton 
+{
+	background-image: url(:/images/minimize1.png);
+}
+
+MinimizeButton:hover
+{
+    background-image: url(:/images/minimize2.png);
+}
+
+MinimizeButton:pressed
+{
+    background-image: url(:/images/minimize2.png);
+}
+
+/*LineEdit style*/
+InfoEdit
+{
+    background-color: #1e1e1e;
+    color: white;
+}
+
+QPushButton#loginBtn:disabled
+{
+    background-image: url(:/images/login0.png);
+    border-width: 0px;
+    border-radius: 10;
+}
+
+QPushButton#loginBtn 
+{
+    background-image: url(:/images/login1.png);
+    border-width: 0px;
+    border-radius: 10;
+}
+
+QPushButton#loginBtn:hover
+{
+    background-image: url(:/images/login2.png);
+    border-width: 0px;
+    border-radius: 10;
+}
+
+QPushButton#loginBtn:disabled
+{
+    background-image: url(:/images/login0.png);
+    border-width: 0px;
+    border-radius: 10;
+}
+
+QLabel#errLabel
+{
+    background-color: #1e1e1e;
+    color: red;
+}
+
+QPushButton#retrieveBtn
+{
+    background-image: url(:/images/retrieve1.png);
+}
+

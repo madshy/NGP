@@ -1,0 +1,73 @@
+QFrame#frame
+{
+    background-image: url(:/images/bg.png);
+}
+
+/*CloseButton*/
+CloseButton
+{
+    background-image: url(:/images/close1.png);
+}
+
+CloseButton:hover
+{
+	background-image: url(:/images/close2.png);
+}
+
+CloseButton:pressed
+{
+	background-image: url(:/images/close2.png);
+}
+
+/*MinimizeButton*/
+MinimizeButton 
+{
+	background-image: url(:/images/minimize1.png);
+}
+
+MinimizeButton:hover
+{
+    background-image: url(:/images/minimize2.png);
+}
+
+MinimizeButton:pressed
+{
+    background-image: url(:/images/minimize2.png);
+}
+
+/*LineEdit style*/
+InfoEdit
+{
+    background-color: #1e1e1e;
+    color: white;
+    font-size: 18px;
+    width: 120px;
+}
+
+QPushButton#registerBtn 
+{
+    width: 30px;
+    height: 30px;
+    border-radius: 15px;
+    background-color: red;
+}
+
+QPushButton#registerBtn:hover
+{
+    width: 30px;
+    height: 30px;
+    border-radius: 15px;
+    background-color: red;
+}
+
+
+QLabel#errLabel
+{
+    background-color: #1e1e1e;
+    color: red;
+}
+
+QLabel
+{
+    font-size: 15px;
+}

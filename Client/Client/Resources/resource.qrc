@@ -1,0 +1,34 @@
+<RCC>
+  <!--images-->
+  <qresource prefix="/images">
+    <file alias="close1.png">../images/common/close1.png</file>
+    <file alias="close2.png">../images/common/close2.png</file>
+    <file alias="minimize1.png">../images/common/minimize1.png</file>
+    <file alias="minimize2.png">../images/common/minimize2.png</file>
+    <file alias="login0.png">../images/login/login0.png</file>
+    <file alias="login1.png">../images/login/login1.png</file>
+    <file alias="login2.png">../images/login/login2.png</file>
+    <file alias="retrieve1.png">../images/login/retrieve1.png</file>
+    <file alias="bg.png">../images/login/bg.png</file>
+  </qresource>
+  
+  <!--styles-->
+  <qresource prefix="/styles">
+    <file alias="loginStyle.css">../styles/loginStyle.css</file>
+    <file alias="registerStyle.css">../styles/registerStyle.css</file>
+  </qresource>
+  
+  <!--user icons-->
+  <qresource prefix="icons/users">
+    <file alias="1.png">../icons/users/1.png</file>
+    <file alias="2.png">../icons/users/2.png</file>
+    <file alias="3.png">../icons/users/3.png</file>
+    <file alias="4.png">../icons/users/4.png</file>
+    <file alias="5.png">../icons/users/5.png</file>
+    <file alias="6.png">../icons/users/6.png</file>
+    <file alias="7.png">../icons/users/7.png</file>
+    <file alias="8.png">../icons/users/8.png</file>
+    <file alias="9.png">../icons/users/9.png</file>
+    <file alias="10.png">../icons/users/10.png</file>
+  </qresource>
+</RCC>
