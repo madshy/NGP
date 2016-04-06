@@ -1,10 +1,20 @@
-﻿/*CloseButton*/
+﻿QFrame#frame
+{
+    background-image: url(:/images/bg.png);
+}
+
+/*CloseButton*/
 CloseButton
 {
     background-image: url(:/images/close1.png);
 }
 
 CloseButton:hover
+{
+	background-image: url(:/images/close2.png);
+}
+
+CloseButton:pressed
 {
 	background-image: url(:/images/close2.png);
 }
@@ -16,6 +26,11 @@ MinimizeButton
 }
 
 MinimizeButton:hover
+{
+    background-image: url(:/images/minimize2.png);
+}
+
+MinimizeButton:pressed
 {
     background-image: url(:/images/minimize2.png);
 }
@@ -48,6 +63,13 @@ QPushButton#loginBtn:hover
     border-radius: 10;
 }
 
+QPushButton#loginBtn:disabled
+{
+    background-image: url(:/images/login0.png);
+    border-width: 0px;
+    border-radius: 10;
+}
+
 QLabel#errLabel
 {
     background-color: #1e1e1e;
@@ -58,3 +80,4 @@ QPushButton#retrieveBtn
 {
     background-image: url(:/images/retrieve1.png);
 }
+

@@ -77,6 +77,15 @@
     <ClCompile Include="custom\InfoEdit.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_RegisterUI.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_RegisterUI.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="custom\RegisterUI.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="Resources\resource.qrc">
@@ -94,8 +103,12 @@
     <CustomBuild Include="include\InfoEdit.h">
       <Filter>Header Files</Filter>
     </CustomBuild>
+    <CustomBuild Include="include\RegisterUI.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
   </ItemGroup>
   <ItemGroup>
     <None Include="styles\loginStyle.css" />
+    <None Include="styles\registerStyle.css" />
   </ItemGroup>
 </Project>

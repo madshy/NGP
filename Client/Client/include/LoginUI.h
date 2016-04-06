@@ -23,6 +23,7 @@ class QPushButton;
 class InfoEdit;
 class QTcpSocket;
 class QString;
+class QFrame;
 
 /*Login window class*/
 class LoginUI : public QWidget
@@ -30,6 +31,7 @@ class LoginUI : public QWidget
 	Q_OBJECT
 
 private:
+	QFrame *_frame;
 	QLabel *_iconLabel;			/*show icon*/
 	QLabel *_errLabel;			/*show if cannot login.*/
 

@@ -31,6 +31,9 @@
 #include <qdatastream.h>
 #include <qbytearray.h>
 #include <qhostaddress.h>
+#include <qpalette.h>
+#include <qframe.h>
+#include <qfile.h>
 
 LoginUI::LoginUI(QWidget *parent)
 	:QWidget(parent), _loginFlag(false)
@@ -47,6 +50,12 @@ LoginUI::LoginUI(QWidget *parent)
 	connect(this, SIGNAL(flagOkToRead()), this, SLOT(result()));
 	connect(_idEdit, SIGNAL(focusGot()), this, SLOT(hideErrLabel()));
 	connect(_pswEdit, SIGNAL(focusGot()), this, SLOT(hideErrLabel()));
+
+	/*set styles*/
+	QFile file(":/styles/loginStyle.css");
+	file.open(QFile::ReadOnly);
+	QString styleSheet = QObject::tr(file.readAll());
+	setStyleSheet(styleSheet);
 }
 
 LoginUI::~LoginUI()
@@ -58,6 +67,10 @@ void LoginUI::initUI()
 	/*Fixed the size*/
 	setMaximumSize(500, 250);
 	setMinimumSize(500, 250);
+
+	_frame = new QFrame(this);
+	_frame->setObjectName("frame");
+	_frame->setFixedSize(500, 250);
 
 	/*Icon, Minimize button and close button*/
 	_iconLabel = new QLabel;
@@ -161,7 +174,6 @@ void LoginUI::initUI()
 	_pswEdit->setFrame(false);
 	_idEdit->setFrame(false);
 
-
 }
 
 void LoginUI::initNet()
@@ -179,6 +191,12 @@ void LoginUI::initNet()
 
 void LoginUI::login()
 {
+	if (QAbstractSocket::SocketState::UnconnectedState == _tcpSocket->state())
+	{
+		_errLabel->setText("Can't connect to the net.");
+		_errLabel->setHidden(false);
+		return;
+	}
 	connect(_tcpSocket, SIGNAL(readyRead()), this, SLOT(readInfo()));
 
 	QString id = _idEdit->text();
@@ -240,6 +258,7 @@ void LoginUI::result()
 {
 	if (!_loginFlag)/*Failed.*/
 	{
+		_errLabel->setText(QObject::tr("Failed to login."));
 		_errLabel->show();
 	}
 	else/*Ok to login and go to logined ui.*/

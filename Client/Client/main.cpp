@@ -1,24 +1,19 @@
 #include <QtWidgets/QApplication>
-#include <qfile.h>
-#include <qstring.h>
 
 #include "../include/LoginUI.h"
+#include "../include/RegisterUI.h"
 
-#include <qwidget.h>
-#include <qlineedit.h>
+#include <qlistwidget.h>
 
 int main(int argc, char *argv[])
 {
 	QApplication a(argc, argv);
 
-	LoginUI loginUI;
+	//LoginUI loginUI;
+	//loginUI.show();
 
-	QFile file(":/styles/loginStyle.css");
-	file.open(QFile::ReadOnly);
-	QString styleSheet = QObject::tr(file.readAll());
-	loginUI.setStyleSheet(styleSheet);
-
-	loginUI.show();
+	RegisterUI *regUI = new RegisterUI;
+	regUI->show();
 
 	return a.exec();
 }
