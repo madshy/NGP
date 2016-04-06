@@ -5,6 +5,7 @@
 *    @mail:madshy@163.com
 *    @date:2016/04/06
 *    @comment:MainUI is a user interface after successing to login.
+*250*700
 *
 ***************************************************/
 
@@ -17,9 +18,16 @@
 
 /*forward declarations*/
 class QLabel;
+class QPushButton;
+class QTabWidget;
+class QListWidget;
+
 class CloseButton;
 class MinimizeButton;
-class QTabWidget;
+class GameListWidget;
+class GameDetailWidget;
+class MsgBar;
 
+class QTcpSocket;
 
 #endif
