@@ -18,7 +18,9 @@ class QLabel;
 class QTextEdit;
 class QTextDocument;
 class QString;
+class CloseButton;
 
+#include <qpushbutton.h>
 #include <qwidget.h>
 
 class GameDetailWidget : public QWidget
@@ -26,16 +28,22 @@ class GameDetailWidget : public QWidget
 	Q_OBJECT
 
 private:
-	QLabel *_iconLabel;
+	QPushButton *_iconLabel;
+	//QLabel *_iconLabel;
 	QLabel *_nameLabel;
 	QLabel *_name;
 	QLabel *_nationLabel;
 	QLabel *_nation;
-	QLabel *_describeLabel;
-	QLabel *_manualLabe;
 
-	QTextEdit *_describeText;
-	QTextEdit *_manualText;
+	//QLabel *_describeLabel;
+	//QLabel *_manualLabe;
+
+	//QTextEdit *_describeText;
+	//QTextEdit *_manualText;
+
+	QTextEdit *_descManText;
+
+	CloseButton *_closeBtn;
 
 public:
 	GameDetailWidget(const QString &, const QString &, const QString &, 
