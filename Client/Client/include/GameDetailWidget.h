@@ -19,7 +19,7 @@
 class QLabel;
 class QTextEdit;
 class QString;
-class CloseButton;
+class MinimizeButton;
 
 #include <qpushbutton.h>
 #include <qwidget.h>
@@ -45,7 +45,7 @@ private:
 
 	QTextEdit *_descManText;
 
-	CloseButton *_closeBtn;
+	MinimizeButton *_minBtn;
 
 public:
 	GameDetailWidget(QWidget *parent = Q_NULLPTR);
@@ -55,6 +55,13 @@ public:
 	/*Only being  called in ctor or slot signaled by a widget signal can make an effect.*/
 	void setDetail(const QString &name, const QString &nation, const QString &iconPath,
 		const QString &desc, const QString &man);
+
+signals:
+	void min();
+
+	protected slots:
+	/*To emit signal min()*/
+	void minSlot();
 };
 
 #endif

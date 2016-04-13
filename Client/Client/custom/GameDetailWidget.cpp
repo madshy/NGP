@@ -15,7 +15,7 @@
 
 /*custom header*/
 #include "../include/GameDetailWidget.h"
-#include "../include/CloseButton.h"
+#include "../include/MinimizeButton.h"
 
 /*other header*/
 #include <qstring.h>
@@ -106,23 +106,23 @@ GameDetailWidget::GameDetailWidget(QWidget *parent)
 
 	/*window layout*/
 	QVBoxLayout *windowLayout = new QVBoxLayout;
-	_closeBtn = new CloseButton;
-	QHBoxLayout *closeLayout = new QHBoxLayout;
-	closeLayout->addStretch();
-	closeLayout->addWidget(_closeBtn);
-	windowLayout->addLayout(closeLayout);
+	_minBtn = new MinimizeButton;
+	QHBoxLayout *minLayout = new QHBoxLayout;
+	minLayout->addStretch();
+	minLayout->addWidget(_minBtn);
+	windowLayout->addLayout(minLayout);
 	windowLayout->addLayout(mainLayout);
 	windowLayout->setMargin(0);
 	windowLayout->setContentsMargins(10, 0, 0, 10);
 
 	setLayout(windowLayout);
 
-	_closeBtn->setStyleSheet("CloseButton{"
-		"background-image: url(:/images/close1.png);}"
-		"CloseButton:hover{"
-		"background-image: url(:/images/close2.png);}"
-		"CloseButton:pressed{"
-		"background-image: url(:/images/close2.png);}");
+	_minBtn->setStyleSheet("MinimizeButton{"
+		"background-image: url(:/images/minimize1.png);}"
+		"MinimizeButton:hover{"
+		"background-image: url(:/images/minimize2.png);}"
+		"MinimizeButton:pressed{"
+		"background-image: url(:/images/minimize2.png);}");
 
 	setStyleSheet(
 		"QTextEdit{border: 0; background-color: rgba(0, 0, 0, 0);}"
@@ -132,7 +132,8 @@ GameDetailWidget::GameDetailWidget(QWidget *parent)
 	
 	setFixedSize(450, 350);
 
-	connect(_closeBtn, SIGNAL(clicked()), this, SLOT(close()));
+	connect(_minBtn, SIGNAL(clicked()), this, SLOT(showMinimized()));
+	connect(_minBtn, SIGNAL(clicked()), this, SLOT(minSlot()));
 }
 
 GameDetailWidget::~GameDetailWidget()
@@ -163,4 +164,9 @@ void GameDetailWidget::setDetail(const QString &name, const QString &nation, con
 
 	/*move the cursor to the start.*/
 	_descManText->moveCursor(QTextCursor::Start);
+}
+
+void GameDetailWidget::minSlot()
+{
+	emit min();
 }
