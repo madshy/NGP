@@ -23,30 +23,24 @@
 #include <qpalette.h>
 #include <qboxlayout.h>
 
-GameDetailWidget::GameDetailWidget(const QString &name, const QString &nation,
-	const QString &iconPath, QTextDocument* describeDoc, QTextDocument *manualDoc, QWidget *parent)
+GameDetailWidget::GameDetailWidget(QWidget *parent)
 	: QWidget(parent)
 {
 	/*set icon*/
 	/*actually it's a btn look like label.*/
-	_iconLabel = new QPushButton; 
-	_iconLabel->setFlat(true);
-	_iconLabel->setFixedSize(60, 60);
-	_iconLabel->setEnabled(false);
-	QLabel *l = new QLabel;
-	QPalette palette;
-	palette.setBrush(_iconLabel->backgroundRole(), QBrush(QImage(iconPath)));
-	_iconLabel->setPalette(palette);
-	_iconLabel->setAutoFillBackground(true);
+	_iconBtn = new QPushButton; 
+	_iconBtn->setFlat(true);
+	_iconBtn->setFixedSize(60, 60);
+	//_iconBtn->setEnabled(false);
 
 	QHBoxLayout *iconLayout = new QHBoxLayout;
 	//iconLayout->addStretch();
-	iconLayout->addWidget(_iconLabel);
+	iconLayout->addWidget(_iconBtn);
 	iconLayout->addStretch();
 
 	/*set name*/
 	_nameLabel = new QLabel(QString::fromLocal8Bit("名称:"));
-	_name = new QLabel(name);
+	_name = new QLabel;
 
 	QHBoxLayout *nameLayout = new QHBoxLayout;
 	nameLayout->addWidget(_nameLabel);
@@ -54,7 +48,7 @@ GameDetailWidget::GameDetailWidget(const QString &name, const QString &nation,
 
 	/*set nation*/
 	_nationLabel = new QLabel(QString::fromLocal8Bit("民族:"));
-	_nation = new QLabel(nation);
+	_nation = new QLabel;
 
 	QHBoxLayout *nationLayout = new QHBoxLayout;
 	nationLayout->addWidget(_nationLabel);
@@ -85,14 +79,8 @@ GameDetailWidget::GameDetailWidget(const QString &name, const QString &nation,
 	/*set describe and manual*/
 	_descManText = new QTextEdit;
 	_descManText->setReadOnly(true);
-	_descManText->append("<b>" + QString::fromLocal8Bit("游戏简介:") + "</b>");
-	_descManText->append(describeDoc->toHtml());
-	_descManText->append("");
-	_descManText->append("<b>" + QString::fromLocal8Bit("游戏规则:") + "</b>");
-	_descManText->append(manualDoc->toHtml());
 
-	/*move the cursor to the start.*/
-	_descManText->moveCursor(QTextCursor::Start);
+
 
 	/*left:info layout*/
 	QVBoxLayout *infoLayout = new QVBoxLayout;
@@ -150,4 +138,29 @@ GameDetailWidget::GameDetailWidget(const QString &name, const QString &nation,
 GameDetailWidget::~GameDetailWidget()
 {
 
+}
+
+void GameDetailWidget::setDetail(const QString &name, const QString &nation, const QString &iconPath,
+	const QString &desc, const QString &man)
+{
+	QPalette palette;
+	palette.setBrush(_iconBtn->backgroundRole(), QBrush(QImage(iconPath)));
+	_iconBtn->setPalette(palette);
+	_iconBtn->setAutoFillBackground(true);
+
+	/*name*/
+	_name->setText(name);
+
+	/*nation*/
+	_nation->setText(nation);
+
+	/*desc and man*/
+	_descManText->append("<b>" + QString::fromLocal8Bit("游戏简介:") + "</b>");
+	_descManText->append(desc);
+	_descManText->append("");
+	_descManText->append("<b>" + QString::fromLocal8Bit("游戏规则:") + "</b>");
+	_descManText->append(man);
+
+	/*move the cursor to the start.*/
+	_descManText->moveCursor(QTextCursor::Start);
 }
