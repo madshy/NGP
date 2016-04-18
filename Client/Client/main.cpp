@@ -43,12 +43,14 @@ int main(int argc, char *argv[])
 	////gdw->setDetail("three", "miao", ":/icons/users/1.png", descDoc->toHtml(), manDoc->toHtml());
 	////gdw->show();
 	//GameListItem *item = new GameListItem(QString(":/icons/users/1.png"), QString("three"), QString("miao"),  
-	//	descDoc->toHtml(), manDoc->toHtml(), QIcon(":/icons/users/1.png"), "xksadfasfdadfs");
+	//	descDoc->toHtml(), manDoc->toHtml(), QIcon(":/icons/users/1.png"), "gamename");
 	//QList<GameListItem*> list;
 	//list.append(item);
 
 	//GameListWidget *game = new GameListWidget(&list);
 	//game->show();
+	//game->setGeometry(0, 0, game->geometry().width(), game->geometry().height());
+
 	QList<QString> buddys;
 	buddys.append("shy");
 	buddys.append("ma");
