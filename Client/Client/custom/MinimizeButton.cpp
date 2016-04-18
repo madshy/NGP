@@ -16,6 +16,13 @@ MinimizeButton::MinimizeButton(QWidget *parent)
 	setMinimumSize(25, 25);
 	setMaximumSize(25, 25);
 
+	setStyleSheet("MinimizeButton{"
+		"background-image: url(:/images/minimize1.png);}"
+		"MinimizeButton:hover{"
+		"background-image: url(:/images/minimize2.png);}"
+		"MinimizeButton:pressed{"
+		"background-image: url(:/images/minimize2.png);}"
+		);
 	setToolTip("Minimize the window");
 	setFlat(true);
 }
