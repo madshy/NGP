@@ -16,6 +16,15 @@ CloseButton::CloseButton(QWidget *parent)
 	setMinimumSize(25, 25);
 	setMaximumSize(25, 25);
 
+
+	setStyleSheet("CloseButton{"
+		"background-image: url(:/images/close1.png);}"
+		"MinimizeButton:hover{"
+		"background-image: url(:/images/close2.png);}"
+		"MinimizeButton:pressed{"
+		"background-image: url(:/images/close2.png);}"
+		);
+
 	setToolTip("Close the window");
 	setFlat(true);
 }

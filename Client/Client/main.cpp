@@ -4,10 +4,18 @@
 #include "../include/RegisterUI.h"
 
 #include <qlistwidget.h>
-//test
-#include <qtextedit.h>
+
+#include "../include/GameDetailWidget.h"
+#include <qtextstream.h>
+#include <qfile.h>
 #include <qtextdocument.h>
-#include <qtextcursor.h>
+#include <qlabel.h>
+
+#include "../include/GameListWidget.h"
+#include "../include/GameListItem.h"
+#include <qlist.h>
+#include "../include/MainUI.h"
+#include "../include/Account.h"
 
 int main(int argc, char *argv[])
 {
@@ -19,14 +27,44 @@ int main(int argc, char *argv[])
 	//RegisterUI *regUI = new RegisterUI;
 	//regUI->show();
 
-	QTextEdit *textEdit = new QTextEdit;
-	QTextDocument *doc = new QTextDocument("image");
-	//doc->addResource(QTextDocument::ResourceType::ImageResource, QUrl(":/images/bg.png"), QVariant("image"));
+	//QFile *desc = new QFile("file/desc.html");
+	//desc->open(QFile::ReadOnly);
+	//QTextStream descText(desc);
 
-	QTextCursor *cursor = new QTextCursor(doc);
-	cursor->insertImage(QImage(":/images/bg.png"), QString("isdfsdfsd"));
+	//QFile *man = new QFile("file/man.html");
+	//man->open(QFile::ReadOnly);
 
-	textEdit->setDocument(doc);
-	//textEdit->show();
+	//QTextDocument *descDoc = new QTextDocument;
+	//descDoc->setHtml(desc->readAll());
+	//QTextDocument *manDoc = new QTextDocument;
+	//manDoc->setHtml(man->readAll());
+
+	////GameDetailWidget *gdw = new GameDetailWidget;
+	////gdw->setDetail("three", "miao", ":/icons/users/1.png", descDoc->toHtml(), manDoc->toHtml());
+	////gdw->show();
+	//GameListItem *item = new GameListItem(QString(":/icons/users/1.png"), QString("three"), QString("miao"),  
+	//	descDoc->toHtml(), manDoc->toHtml(), QIcon(":/icons/users/1.png"), "gamename");
+	//QList<GameListItem*> list;
+	//list.append(item);
+
+	//GameListWidget *game = new GameListWidget(&list);
+	//game->show();
+	//game->setGeometry(0, 0, game->geometry().width(), game->geometry().height());
+
+	QList<QString> buddys;
+	buddys.append("shy");
+	buddys.append("ma");
+	buddys.append("uchiha");
+
+	QList<QString> games;
+	games.append("lol");
+	games.append("dnf");
+	games.append("three");
+
+	Account acc("madshy", "miao", ":/icons/users/2.png", buddys, games);
+
+	MainUI *mainUI = new MainUI(nullptr, acc);
+	mainUI->show();
+
 	return a.exec();
 }

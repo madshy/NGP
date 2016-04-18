@@ -19,15 +19,52 @@
 /*forward declarations*/
 class QLabel;
 class QPushButton;
+class QTreeWidget;
 class QTabWidget;
-class QListWidget;
 
 class CloseButton;
 class MinimizeButton;
 class GameListWidget;
-class GameDetailWidget;
-class MsgBar;
 
 class QTcpSocket;
+
+class Account;
+
+class MainUI : public QWidget
+{
+	Q_OBJECT
+
+private:
+	QLabel *_logoLabel;
+	QLabel *_nameLabel;
+	QLabel *_nationLabel;
+	
+	CloseButton *_clsBtn;
+	MinimizeButton *_minBtn;
+
+	QPushButton *_gameCenterBtn;
+	QPushButton *_addBuddyBtn;
+	QPushButton *_addGameBtn;
+	QPushButton *_iconBtn;
+
+	QTabWidget *_buddyGameTabWidget;
+
+	QTcpSocket *_tcpSocket;
+
+	GameListWidget *_gameList;
+
+public:
+	MainUI(QTcpSocket *, QWidget *parent = Q_NULLPTR);
+	MainUI(QTcpSocket *, const Account &, QWidget *parent = Q_NULLPTR);
+
+	protected slots:
+	void addBuddySlot();
+	void addGameSlot();
+	void gameCenterSlot();
+
+protected:
+	MainUI(const MainUI&);
+	const MainUI& operator = (const MainUI&);
+};
 
 #endif
