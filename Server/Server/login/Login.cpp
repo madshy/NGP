@@ -174,6 +174,48 @@ void Login::login()
 		return;
 	}
 
+	/*
+	*request buddys format:
+	*blockSize + flag('b') + user_id
+	*
+	*reply format:
+	*blockSize + flag('b') + quint16(num) + num QStrings(buddy).
+	*num is the number of buddys.
+	*/
+	case 'b':
+	{
+		/*read request*/
+		QString user_id;
+		in >> user_id;
+
+		/*look into database.*/
+		QString sql("select * from Buddy where user_id = '");
+		sql += user_id + "'";
+
+		if (_db.isOpen())
+		{
+			quint16 num = 0;
+			out << quint16(0) << quint8('b') << quint16(0);
+			query.exec(sql);
+			while (query.next())
+			{
+				++num;
+				QString buddy = query.value("buddy_id").toString();
+				out << buddy;
+			}
+
+			out.device()->seek(0);
+			out << quint16(block.size() - sizeof(quint16));
+
+			out.device()->seek(3);//what's the number?
+			out << quint16(num);
+
+			_tcpSock->write(block);
+		}
+		return;
+
+	}
+
 	/*default, not defined at present.*/
 	default:
 		break;
