@@ -14,6 +14,7 @@
 #define LOGINUI_H
 
 #include <qwidget.h>
+#include <qstring.h>
 
 /*forward declaration*/
 class QLabel;
@@ -22,7 +23,6 @@ class MinimizeButton;
 class QPushButton;
 class InfoEdit;
 class QTcpSocket;
-class QString;
 class QFrame;
 
 /*Login window class*/
@@ -46,16 +46,15 @@ private:
 
 	QTcpSocket *_tcpSocket;		/*hold on a connection to server.*/
 
-	bool _loginFlag;				/*true means login ok and false means failed.*/
+	QString _id;
+	QString _nation;
+	QString _icon;
 
 private:
 	/*Initialize the UI components.*/
 	void initUI();
 	/*Initialize the network*/
 	void initNet();
-
-signals:
-	void flagOkToRead();
 
 	/*ctors and dtors*/
 public:
@@ -69,10 +68,10 @@ public:
 	void reg();
 	/*called when _retrieveBtn clicked.*/
 	void retrieve();
-	/*called when _tcpSocket is ready to be read.*/
-	void readInfo();
-	/*called when signal flagOkToRead emited.*/
-	void result();
+	/*called when _tcpSocket is ready to be read after login btn clicked.*/
+	void replyForLogin();
+	/*called when _tcpSocket is ready to be read after login ok.*/
+	void replyForQueryBuddys();
 	/*called when need to hide error label.*/
 	void hideErrLabel();
 };

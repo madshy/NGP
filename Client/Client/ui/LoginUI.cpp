@@ -20,6 +20,8 @@
 #include "../include/CloseButton.h"
 #include "../include/MinimizeButton.h"
 #include "../include/InfoEdit.h"
+#include "../include/MainUI.h"
+#include "../include/Account.h"
 
 /*Qt Layout header*/
 #include <qboxlayout.h>
@@ -34,9 +36,10 @@
 #include <qpalette.h>
 #include <qframe.h>
 #include <qfile.h>
+#include <qlist.h>
 
 LoginUI::LoginUI(QWidget *parent)
-	:QWidget(parent), _loginFlag(false)
+	:QWidget(parent)
 {
 	initNet();
 	initUI();
@@ -179,7 +182,7 @@ void LoginUI::initUI()
 void LoginUI::initNet()
 {
 	/*init the connection.*/
-	_tcpSocket = new QTcpSocket();
+	_tcpSocket = new QTcpSocket;
 	if (!_tcpSocket->bind(QHostAddress("127.0.0.1"), 1995))
 	{
 		qDebug() << "Failed to bind.";
@@ -191,14 +194,29 @@ void LoginUI::initNet()
 
 void LoginUI::login()
 {
-	if (QAbstractSocket::SocketState::UnconnectedState == _tcpSocket->state())
+	/*user_id or password cannot be null.*/
+	if ("" == _idEdit->text())
 	{
-		_errLabel->setText("Can't connect to the net.");
+		_errLabel->setText(QString::fromLocal8Bit("ÕËºÅ²»ÄÜÎª¿Õ"));
 		_errLabel->setHidden(false);
 		return;
 	}
-	connect(_tcpSocket, SIGNAL(readyRead()), this, SLOT(readInfo()));
+	if ("" == _pswEdit->text())
+	{
+		_errLabel->setText(QString::fromLocal8Bit("ÃÜÂë²»ÄÜÎª¿Õ"));
+		_errLabel->setHidden(false);
+		return;
+	}
 
+	/*Unavailable net.*/
+	if (QAbstractSocket::SocketState::UnconnectedState == _tcpSocket->state())
+	{
+		_errLabel->setText(QString::fromLocal8Bit("ÎÞ·¨Á¬½Óµ½ÍøÂç"));
+		_errLabel->setHidden(false);
+		return;
+	}
+
+	
 	QString id = _idEdit->text();
 	QString psw = _pswEdit->text();
 
@@ -210,6 +228,8 @@ void LoginUI::login()
 	out.device()->seek(0);
 	out << quint16(block.size() - sizeof(quint16));
 	_tcpSocket->write(block);
+
+	connect(_tcpSocket, SIGNAL(readyRead()), this, SLOT(replyForLogin()));
 }
 
 void LoginUI::reg()
@@ -222,11 +242,9 @@ void LoginUI::retrieve()
 
 }
 
-void LoginUI::readInfo()
+void LoginUI::replyForLogin()
 {
-	disconnect(_tcpSocket, SIGNAL(readyRead()), this, SLOT(readInfo()));
-
-	_loginFlag = false;
+	disconnect(_tcpSocket, SIGNAL(readyRead()), this, SLOT(replyForLogin()));
 
 	QDataStream in(_tcpSocket);
 	in.setVersion(QDataStream::Qt_5_6);
@@ -235,7 +253,8 @@ void LoginUI::readInfo()
 	if (_tcpSocket->bytesAvailable() <= sizeof(quint16))
 	{
 		qDebug() << "Error size of block.";
-		emit flagOkToRead();
+		_errLabel->setText(QString::fromLocal8Bit("ÍøÂç¹ÊÕÏ"));
+		_errLabel->setHidden(false);
 		return;
 	}
 
@@ -243,28 +262,107 @@ void LoginUI::readInfo()
 	if (_tcpSocket->bytesAvailable() < blockSize)
 	{
 		qDebug() << "No info in block.";
-		emit flagOkToRead();
+		_errLabel->setText(QString::fromLocal8Bit("ÍøÂç¹ÊÕÏ"));
+		_errLabel->setHidden(false);
 		return;
 	}
 
 	quint8 flag;
 	in >> flag;
 
-	_loginFlag = flag == 'o';
-	emit flagOkToRead();
+	if (flag == 'o')/*Login ok.*/
+	{
+		in >> _id >> _nation >> _icon;
+		/*
+		*Request for buddys format(user_id's buddys):
+		blockSize + flag('b') + user_id
+		*/
+		QByteArray block;
+		QDataStream out(&block, QIODevice::WriteOnly);
+		out.setVersion(QDataStream::Qt_5_6);
+
+		out << quint16(0) << quint8('b') << _id;
+		out.device()->seek(0);
+		out << quint16(block.size() - sizeof(quint16));
+		_tcpSocket->write(block);
+
+		connect(_tcpSocket, SIGNAL(readyRead()), this, SLOT(replyForQueryBuddys()));
+		return;
+	}
+	else/*Failed*/
+	{
+		_errLabel->setText(QString::fromLocal8Bit("ÕËºÅ»òÃÜÂë´íÎó"));
+		_errLabel->setHidden(false);
+		return;
+	}
+
 }
 
-void LoginUI::result()
+void LoginUI::replyForQueryBuddys()
 {
-	if (!_loginFlag)/*Failed.*/
-	{
-		_errLabel->setText(QObject::tr("Failed to login."));
-		_errLabel->show();
-	}
-	else/*Ok to login and go to logined ui.*/
-	{
+	disconnect(_tcpSocket, SIGNAL(readyRead()), this, SLOT(replyForQueryBuddys()));
 
+	QDataStream in(_tcpSocket);
+	in.setVersion(QDataStream::Qt_5_6);
+
+	quint16 blockSize;
+	if (_tcpSocket->bytesAvailable() <= sizeof(quint16))
+	{
+		qDebug() << "Error size of block.";
+		_errLabel->setText(QString::fromLocal8Bit("ÍøÂç¹ÊÕÏ"));
+		_errLabel->setHidden(false);
+		return;
 	}
+
+	in >> blockSize;
+	if (_tcpSocket->bytesAvailable() < blockSize)
+	{
+		qDebug() << "No info in block.";
+		_errLabel->setText(QString::fromLocal8Bit("ÍøÂç¹ÊÕÏ"));
+		_errLabel->setHidden(false);
+		return;
+	}
+
+	quint8 flag;
+	in >> flag;
+	if ('b' != flag)
+	{
+		return;
+	}
+
+	/*get buddys*/
+	quint16 numBuddys;
+	in >> numBuddys;
+	QList<QString> buddys;
+	QString buddy;
+	for (quint16 index = 0; index < numBuddys; ++index)
+	{
+		in >> buddy;
+		buddys.append(buddy);
+	}
+
+	/*
+	*get local game
+	*read the xml file.
+	*a null at present for not want to read xml file.
+	****************************************************************************************
+	****************************************************************************************
+	****************************************************************************************
+	****************************************************************************************
+	****************************************************************************************
+	****************************************************************************************
+	****************************************************************************************
+	****************************************************************************************
+	****************************************************************************************
+	****************************************************************************************
+	****************************************************************************************
+	****************************************************************************************
+	*/
+	quintptr sockDesc = _tcpSocket->socketDescriptor();
+	showMinimized();
+	(new MainUI(sockDesc, Account(_id, _nation, _icon, buddys, QList<QString>())))->show();
+	close();
+
 }
 
 void LoginUI::hideErrLabel()
