@@ -10,6 +10,11 @@
     <file alias="login2.png">../images/login/login2.png</file>
     <file alias="retrieve1.png">../images/login/retrieve1.png</file>
     <file alias="bg.png">../images/login/bg.png</file>
+    <file alias="bg_list1.png">../images/main/bg_list1.png</file>
+    <file alias="bg_list2.png">../images/main/bg_list2.png</file>
+    <file alias="bg_main1.png">../images/main/bg_main1.png</file>
+    <file alias="bg_main2.png">../images/main/bg_main2.png</file>
+    <file alias="bg_main3.png">../images/main/bg_main3.png</file>
   </qresource>
   
   <!--styles-->

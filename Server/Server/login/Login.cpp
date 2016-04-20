@@ -25,7 +25,7 @@ Login::Login(QObject *parent, quintptr sock, const QString& connName)
 	_tcpSock = new QTcpSocket();
 	_tcpSock->setSocketDescriptor(_sock);
 	connect(_tcpSock, SIGNAL(readyRead()), this, SLOT(login()));
-	connect(_tcpSock, SIGNAL(disconnected()), this, SLOT(logout()));
+	//connect(_tcpSock, SIGNAL(disconnected()), this, SLOT(logout()));
 }
 
 Login::~Login()

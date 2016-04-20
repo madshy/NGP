@@ -46,10 +46,9 @@ InfoEdit
 
 QPushButton#registerBtn 
 {
-    width: 30px;
+    /*width: 30px;
     height: 30px;
-    border-radius: 15px;
-    background-color: red;
+    border-radius: 15px;*/
 }
 
 QPushButton#registerBtn:hover

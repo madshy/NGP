@@ -5,6 +5,7 @@
 
 #include "include/Database.h"
 #include "include/LoginServer.h"
+#include "include/TransferServer.h"
 
 int main(int argc, char *argv[])
 {
@@ -15,6 +16,8 @@ int main(int argc, char *argv[])
 
 	LoginServer loginServer(0, addr, port);
 	loginServer.start();
+
+	TransferServer server;
 
 	return a.exec();
 }
