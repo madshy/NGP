@@ -12,16 +12,18 @@
 
 GameListItem::GameListItem(
 	const QString &iconPath, const QString &name, const QString &nation,
-	const QString &desc, const QString &man, 
+	const QString &desc, const QString &man, const QString &downloadPath, 
 	const QIcon &icon, const QString &text, QListWidget *parent, int type)
 	:QListWidgetItem(icon, text, parent, type), 
-	_iconPath(iconPath), _name(name), _nation(nation), _desc(desc), _man(man), _infoMap()
+	_iconPath(iconPath), _name(name), _nation(nation), _desc(desc), _man(man),
+	_downloadPath(downloadPath) , _infoMap()
 {
 	_infoMap.insert("iconPath", _iconPath);
 	_infoMap.insert("name", _name);
 	_infoMap.insert("nation", _nation);
 	_infoMap.insert("desc", _desc);
 	_infoMap.insert("man", _man);
+	_infoMap.insert("downloadPath", _downloadPath);
 }
 
 GameListItem::~GameListItem()
@@ -56,4 +58,9 @@ const QString GameListItem::getDesc()
 const QString GameListItem::getMan()
 {
 	return _man;
+}
+
+const QString GameListItem::getDownloadPath()
+{
+	return _downloadPath;
 }

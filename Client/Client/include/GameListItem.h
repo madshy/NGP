@@ -25,13 +25,14 @@ private:
 	QString _nation;
 	QString _desc;
 	QString _man;
+	QString _downloadPath;
 
 	QMap<QString, QString> _infoMap;
 
 public:
 	GameListItem(
 		const QString &iconPath, const QString &name, const QString &nation, 
-		const QString &desc, const QString &man, 
+		const QString &desc, const QString &man, const QString &downloadPath, 
 		const QIcon &icon, const QString &text, QListWidget *parent = Q_NULLPTR, int type = UserType);
 	~GameListItem();
 
@@ -56,6 +57,9 @@ public:
 
 	/*get man*/
 	const QString getMan();
+
+	/*get downloadPath*/
+	const QString getDownloadPath();
 };
 
 #endif
