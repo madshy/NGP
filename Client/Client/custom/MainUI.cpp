@@ -33,14 +33,14 @@
 #include <qpalette.h>
 #include "../include/Account.h"
 
-MainUI::MainUI(QTcpSocket *tcpSocket, QWidget *parent)
-	:QWidget(parent), _tcpSocket(tcpSocket), _gameList(nullptr)
+MainUI::MainUI(qintptr sock, QWidget *parent)
+	:QWidget(parent), _tcpSocket(), _gameList(nullptr)
 {
 
 }
 
-MainUI::MainUI(QTcpSocket *tcpSocket, const Account &account, QWidget *parent)
-	: QWidget(parent), _tcpSocket(tcpSocket), _gameList(nullptr)
+MainUI::MainUI(qintptr sock, const Account &account, QWidget *parent)
+	: QWidget(parent), _tcpSocket(), _gameList(nullptr)
 {
 	/*logo, close and minimize button*/
 	_logoLabel = new QLabel;
@@ -85,7 +85,9 @@ MainUI::MainUI(QTcpSocket *tcpSocket, const Account &account, QWidget *parent)
 	infoLayout->addSpacing(5);
 
 	_buddyGameTabWidget = new QTabWidget;
+	_buddyGameTabWidget->setStyleSheet("QTabWidget{border: 0; background-color: rgba(0, 0, 0, 0);}");
 	QTreeView *buddyTree = new QTreeView;
+	buddyTree->setStyleSheet("QTreeView{border: 0; background-color: rgba(0, 0, 0, 0);}");
 	QStandardItemModel *buddyStandardModel = new QStandardItemModel;
 	QStandardItem *buddyRootNode = buddyStandardModel->invisibleRootItem();
 	QStandardItem *buddyRootItem = new QStandardItem(QString::fromLocal8Bit("我的好友"));
@@ -99,6 +101,7 @@ MainUI::MainUI(QTcpSocket *tcpSocket, const Account &account, QWidget *parent)
 	buddyTree->setHeaderHidden(true);//hidden the header texted 1 or may be "l"
 
 	QTreeView *gameTree = new QTreeView;
+	gameTree->setStyleSheet("QTreeView{border: 0; background-color: rgba(0, 0, 0, 0);}");
 	QStandardItemModel *gameStandardModel = new QStandardItemModel;
 	QStandardItem *gameRootNode = gameStandardModel->invisibleRootItem();
 	QStandardItem *gameRootItem = new QStandardItem(QString::fromLocal8Bit("我的游戏"));
@@ -110,6 +113,7 @@ MainUI::MainUI(QTcpSocket *tcpSocket, const Account &account, QWidget *parent)
 	gameRootNode->appendRow(gameRootItem);
 	gameTree->setModel(gameStandardModel);
 	gameTree->setHeaderHidden(true);
+	gameTree->setContentsMargins(0, 0, 0, 0);
 
 	_buddyGameTabWidget->addTab(buddyTree, QString::fromLocal8Bit("伙伴"));
 	_buddyGameTabWidget->addTab(gameTree, QString::fromLocal8Bit("游戏"));
@@ -138,6 +142,12 @@ MainUI::MainUI(QTcpSocket *tcpSocket, const Account &account, QWidget *parent)
 	connect(_minBtn, SIGNAL(clicked()), this, SLOT(showMinimized()));
 	connect(_clsBtn, SIGNAL(clicked()), this, SLOT(close()));
 	connect(_gameCenterBtn, SIGNAL(clicked()), this, SLOT(gameCenterSlot()));
+
+	//setStyleSheet("MainUI{background-image: url(:/images/bg_main1.png;)}");
+	QPalette paletteMain;
+	paletteMain.setBrush(backgroundRole(), QBrush(QImage(":/images/bg_main1.png")));
+	setPalette(paletteMain);
+	setAutoFillBackground(true);
 }
 
 void MainUI::addBuddySlot()

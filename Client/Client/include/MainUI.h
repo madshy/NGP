@@ -54,8 +54,8 @@ private:
 	GameListWidget *_gameList;
 
 public:
-	MainUI(QTcpSocket *, QWidget *parent = Q_NULLPTR);
-	MainUI(QTcpSocket *, const Account &, QWidget *parent = Q_NULLPTR);
+	MainUI(qintptr, QWidget *parent = Q_NULLPTR);
+	MainUI(qintptr, const Account &, QWidget *parent = Q_NULLPTR);
 
 	protected slots:
 	void addBuddySlot();
