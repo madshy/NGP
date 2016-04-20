@@ -10,6 +10,7 @@
 
 /*qt widget header*/
 #include <qlistwidget.h>
+#include <qmessagebox.h>
 
 /*layout header*/
 #include <qboxlayout.h>
@@ -23,9 +24,16 @@
 /*other widget*/
 #include <qfile.h>
 #include <qstring.h>
+#include <qbytearray.h>
+#include <qdatastream.h>
+#include <qtcpsocket.h>
+#include <qhostaddress.h>
+
+#include "../include/GameDownloadThread.h"
 
 GameListWidget::GameListWidget(QList<GameListItem *> *list, QWidget *parent)
-	:QWidget(parent)
+	:QWidget(parent), _tcpSocket(nullptr), _totalBytes(0), _bytesReceived(0), _fileNameSize(0),
+	_fileName(), _file(nullptr), _inBlock()
 {
 	/*close Button*/
 	_closeBtn = new CloseButton;
@@ -64,6 +72,7 @@ GameListWidget::GameListWidget(QList<GameListItem *> *list, QWidget *parent)
 	/*signals and slots*/
 	connect(_closeBtn, SIGNAL(clicked()), this, SLOT(close()));
 	connect(_list, SIGNAL(itemClicked(QListWidgetItem *)), this, SLOT(detail(QListWidgetItem *)));
+	connect(_list, SIGNAL(itemDoubleClicked(QListWidgetItem *)), this, SLOT(downloadRequest(QListWidgetItem *)));
 	connect(_detail, SIGNAL(min()), this, SLOT(hideDetail()));
 
 	/*set style*/
@@ -75,12 +84,98 @@ GameListWidget::GameListWidget(QList<GameListItem *> *list, QWidget *parent)
 
 	setWindowFlags(Qt::FramelessWindowHint);
 	setFixedSize(450, 350);
+	QPalette palette;
+	palette.setBrush(backgroundRole(), QBrush(QImage(":/images/bg_list1.png")));
+	setPalette(palette);
+	setAutoFillBackground(true);
+	//setStyleSheet("GameListWidget{background-image: url(:/images/bg_list1.png;)}");
 }
 
 GameListWidget::~GameListWidget()
 {
 
 }
+
+void GameListWidget::downloadRequest(QListWidgetItem *item)
+{
+	if (!_tcpSocket)
+	{
+		_tcpSocket = new QTcpSocket;
+		_tcpSocket->bind(QHostAddress("127.0.0.1"), 2015);
+		_tcpSocket->connectToHost(QHostAddress("127.0.0.1"), 2016);
+		connect(_tcpSocket, SIGNAL(readyRead()), this, SLOT(download()));
+	}
+
+	GameListItem *gameItem = dynamic_cast<GameListItem *>(item);
+
+	QByteArray outBlock;
+	QDataStream out(&outBlock, QIODevice::WriteOnly);
+	out.setVersion(QDataStream::Qt_5_6);
+
+	out << gameItem->getDownloadPath();
+	_tcpSocket->write(outBlock);
+}
+
+void GameListWidget::download()
+{
+	///*because response readyRead in GameDownloadThread*/
+	//disconnect(_tcpSocket, SIGNAL(readyRead()), this, SLOT(download()));
+
+	//(new GameDownloadThread(_tcpSocket, this))->start();
+
+	QDataStream in(_tcpSocket);
+	in.setVersion(QDataStream::Qt_5_6);
+
+	if (_bytesReceived <= sizeof(qint64) * 2)
+	{
+		if ((_tcpSocket->bytesAvailable() >= sizeof(qint64) * 2)
+			&& (0 == _fileNameSize))
+		{
+			in >> _totalBytes >> _fileNameSize;
+			_bytesReceived += sizeof(qint64) * 2;
+		}
+
+		if ((_tcpSocket->bytesAvailable() >= _fileNameSize)
+			&& (0 != _fileNameSize))
+		{
+			in >> _fileName;
+			_bytesReceived += _fileNameSize;
+
+			_file = new QFile(_fileName);
+			if (!_file->open(QFile::WriteOnly))
+			{
+				QMessageBox::warning(0, QString::fromLocal8Bit("应用程序"),
+					QString::fromLocal8Bit("无法读取文件 %1:\n%2.").arg(_fileName).arg(_file->errorString()));
+				return;
+			}
+		}
+		else
+		{
+			return;
+		}
+	}
+
+
+	if (_bytesReceived < _totalBytes)
+	{
+		_bytesReceived += _tcpSocket->bytesAvailable();
+		_inBlock = _tcpSocket->readAll();
+		_file->write(_inBlock);
+		_inBlock.resize(0);
+	}
+
+
+
+/****************************why else cause error(can't receive file content.)*********************
+*****************************Why if can receive ok !!!!!!!!!!!!!!!!!!!!!!*************************/
+	//else/*Fail to receive file*/
+	if (_bytesReceived == _totalBytes)
+	{
+		QMessageBox::information(0, QString::fromLocal8Bit("游戏下载"), QString::fromLocal8Bit("下载完成"), QMessageBox::Ok);
+		_file->close();
+	}
+}
+
 
 void GameListWidget::detail(QListWidgetItem *item)
 {
@@ -90,10 +185,20 @@ void GameListWidget::detail(QListWidgetItem *item)
 	
 	_detail->setHidden(false);
 	setFixedSize(450, 700);
+	QPalette palette;
+	palette.setBrush(backgroundRole(), QBrush(QImage(":/images/bg_list2.png")));
+	setPalette(palette);
+	setAutoFillBackground(true);
+	//setStyleSheet("GameListWidget{background-image: url(:/images/bg_list2.png;)}");
 }
 
 void GameListWidget::hideDetail()
 {
 	_detail->setHidden(true);
 	setFixedSize(450, 350);
+	QPalette palette;
+	palette.setBrush(backgroundRole(), QBrush(QImage(":/images/bg_list1.png")));
+	setPalette(palette);
+	setAutoFillBackground(true);
+	//setStyleSheet("GameListWidget{background-image: url(:/images/bg_list1.png;)}");
 }

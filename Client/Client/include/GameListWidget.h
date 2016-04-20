@@ -17,6 +17,7 @@
 
 #include <qwidget.h>
 #include <qlist.h>
+#include <qbytearray.h>
 
 /*forward declarations.*/
 class CloseButton;
@@ -24,6 +25,10 @@ class GameDetailWidget;
 class QListWidget;
 class QListWidgetItem;
 class GameListItem;
+class QFrame;
+class QString;
+class QTcpSocket;
+class QFile;
 
 class GameListWidget : public QWidget
 {
@@ -33,12 +38,27 @@ private:
 	CloseButton *_closeBtn;   
 	QListWidget *_list;
 	GameDetailWidget *_detail;
+	QFrame *_frame;
+	QTcpSocket *_tcpSocket;
+
+	/*transfer arg*/
+	qint64 _totalBytes;
+	qint64 _bytesReceived;
+	qint64 _fileNameSize;
+
+	QString _fileName;
+	QFile *_file;
+	QByteArray _inBlock;
 
 public:
 	GameListWidget(QList<GameListItem *> *, QWidget *parent = Q_NULLPTR);
 	~GameListWidget();
 
 	protected slots:
+	/*send download request*/
+	void downloadRequest(QListWidgetItem *);
+	/*receive download file*/
+	void download();
 	//show detail when an item is clicked.
 	void detail(QListWidgetItem *);
 	/*
