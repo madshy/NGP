@@ -22,6 +22,7 @@
 #include "../include/InfoEdit.h"
 #include "../include/MainUI.h"
 #include "../include/Account.h"
+#include "../include/RegisterUI.h"
 
 /*Qt Layout header*/
 #include <qboxlayout.h>
@@ -39,9 +40,8 @@
 #include <qlist.h>
 
 LoginUI::LoginUI(QWidget *parent)
-	:QWidget(parent)
+	:QWidget(parent), _tcpSocket(nullptr)
 {
-	initNet();
 	initUI();
 
 	/*connect the signals and slots*/
@@ -50,7 +50,6 @@ LoginUI::LoginUI(QWidget *parent)
 	connect(_registerBtn, SIGNAL(clicked()), this, SLOT(reg()));
 	connect(_retrievePsw, SIGNAL(clicked()), this, SLOT(retrieve()));
 	connect(_loginBtn, SIGNAL(clicked()), this, SLOT(login()));
-	connect(this, SIGNAL(flagOkToRead()), this, SLOT(result()));
 	connect(_idEdit, SIGNAL(focusGot()), this, SLOT(hideErrLabel()));
 	connect(_pswEdit, SIGNAL(focusGot()), this, SLOT(hideErrLabel()));
 
@@ -59,6 +58,14 @@ LoginUI::LoginUI(QWidget *parent)
 	file.open(QFile::ReadOnly);
 	QString styleSheet = QObject::tr(file.readAll());
 	setStyleSheet(styleSheet);
+}
+
+LoginUI::LoginUI(const QString &id, const QString &psw, QWidget *parent)
+	:LoginUI(parent)
+{
+	_idEdit->setText(id);
+	_pswEdit->setText(psw);
+	_loginBtn->setFocus();
 }
 
 LoginUI::~LoginUI()
@@ -94,6 +101,7 @@ void LoginUI::initUI()
 
 	/*Register button and id input widget*/
 	_registerBtn = new QPushButton;
+	_registerBtn->setText(QString::fromLocal8Bit("×¢²á"));
 	_idEdit = new InfoEdit;
 	_registerBtn->setFixedSize(30, 30);
 	_registerBtn->setFlat(true);
@@ -185,7 +193,7 @@ void LoginUI::initNet()
 	_tcpSocket = new QTcpSocket;
 	if (!_tcpSocket->bind(QHostAddress("127.0.0.1"), 1995))
 	{
-		qDebug() << "Failed to bind.";
+		qDebug() << __FILE__ << __LINE__ << "Failed to bind.";
 		return;
 	}
 
@@ -206,6 +214,11 @@ void LoginUI::login()
 		_errLabel->setText(QString::fromLocal8Bit("ÃÜÂë²»ÄÜÎª¿Õ"));
 		_errLabel->setHidden(false);
 		return;
+	}
+
+	if (nullptr == _tcpSocket)
+	{
+		initNet();
 	}
 
 	/*Unavailable net.*/
@@ -234,7 +247,8 @@ void LoginUI::login()
 
 void LoginUI::reg()
 {
-
+	close();
+	(new RegisterUI)->show();
 }
 
 void LoginUI::retrieve()

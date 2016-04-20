@@ -59,6 +59,8 @@ private:
 	/*ctors and dtors*/
 public:
 	LoginUI(QWidget *parent = Q_NULLPTR);
+	/*Set the id and psw*/
+	LoginUI(const QString &, const QString &, QWidget *parent = 0);
 	~LoginUI();
 
 	protected slots:
