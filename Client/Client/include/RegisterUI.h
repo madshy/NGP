@@ -75,6 +75,8 @@ private:
 	bool _mailOk;
 
 	QString _iconPath;
+	QString _id;
+	QString _psw;
 
 	/*ctors and dtors*/
 public:
@@ -88,16 +90,18 @@ private:
 	/*Initialize the network*/
 	void initNet();
 
-signals:
-	void flagOkToRead();
+//signals:
+//	void flagOkToRead();
 
 	protected slots:
 	/*called when register Button is clicked.*/
 	void reg();
-	/*called to read info from server.*/
-	void readInfo();
-	/*called when flagOkToRead emitted.*/
-	void result();
+	/*called when _tcpSocket is ready to be read after reg btn clicked.*/
+	void replyForRegister();
+	///*called to read info from server.*/
+	//void readInfo();
+	///*called when flagOkToRead emitted.*/
+	//void result();
 	/*called when next page btn clicked.*/
 	void nextPage();
 	/*called when pre page btn clicked.*/

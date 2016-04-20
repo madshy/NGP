@@ -22,6 +22,7 @@
 #include "../include/CloseButton.h"
 #include "../include/MinimizeButton.h"
 #include "../include/InfoEdit.h"
+#include "../include/LoginUI.h"
 
 /*Qt Layout header*/
 #include <qboxlayout.h>
@@ -43,18 +44,16 @@
 #include <qregexp.h>
 
 RegisterUI::RegisterUI(QWidget *parent)
-	:QWidget(parent), 
+	:QWidget(parent),
 	_idOk(false), _pswOk(false), _pswConfirmOk(false), _mailOk(false),
-	_iconPath(":/icons/users/1.png")
+	_iconPath(":/icons/users/1.png"), _id(), _psw(), _tcpSocket(nullptr)
 {
-	initNet();
 	initUI();
 
 	/*connect the signals and slots*/
 	connect(_closeBtn, SIGNAL(clicked()), this, SLOT(close()));
 	connect(_minBtn, SIGNAL(clicked()), this, SLOT(showMinimized()));
 	connect(_registerBtn, SIGNAL(clicked()), this, SLOT(reg()));
-	connect(this, SIGNAL(flagOkToRead()), this, SLOT(result()));
 	connect(_nextPageBtn, SIGNAL(clicked()), this, SLOT(nextPage()));
 	connect(_prePageBtn, SIGNAL(clicked()), this, SLOT(prePage()));
 	connect(_iconBtn, SIGNAL(clicked()), this, SLOT(chooseIcon()));
@@ -152,6 +151,7 @@ void RegisterUI::initUI()
 	_nationComboBox->setCurrentIndex(0);
 
 	_nextPageBtn = new QPushButton;
+	_nextPageBtn->setText(QString::fromLocal8Bit("ÏÂÒ»Ò³"));
 	_nextPageBtn->setEnabled(false);
 	//_nextPageBtn->setFixedSize(50, 50);
 
@@ -238,6 +238,8 @@ void RegisterUI::initUI()
 
 	_prePageBtn = new QPushButton;
 	_registerBtn = new QPushButton;
+	_prePageBtn->setText(QString::fromLocal8Bit("ÉÏÒ»Ò³"));
+	_registerBtn->setText(QString::fromLocal8Bit("×¢²á"));
 	_registerBtn->setEnabled(false);
 
 	//_prePageBtn->setFixedSize(50, 25);
@@ -272,13 +274,17 @@ void RegisterUI::initUI()
 	//page_2_layout->addWidget(_iconLabel, 1, 0, Qt::AlignRight | Qt::AlignTop);
 	//page_2_layout->addWidget(_iconBtn, 1, 1, Qt::AlignLeft | Qt::AlignTop);
 	
+	_errLabel = new QLabel;
+	_errLabel->setHidden(true);
+	page_2_layout->addWidget(_errLabel, 2, 1);
+
 	/*prePageBtn*/
 	QHBoxLayout *btnLayout = new QHBoxLayout;
 	btnLayout->addSpacing(35);
 	btnLayout->addWidget(_prePageBtn);
 	btnLayout->addSpacing(20);
 	btnLayout->addWidget(_registerBtn);
-	page_2_layout->addLayout(btnLayout, 2, 1, Qt::AlignLeft);
+	page_2_layout->addLayout(btnLayout, 3, 1, Qt::AlignLeft);
 
 	page2->setLayout(page_2_layout);
 	_stackLayout->addWidget(page2);
@@ -305,14 +311,72 @@ void RegisterUI::initUI()
 
 void RegisterUI::reg()
 {
+	/*connect to the net.*/
+	if (nullptr == _tcpSocket)
+	{
+		initNet();
+	}
+
+	_id = _idEdit->text();
+	_psw = _pswEdit->text();
+	QString nation = _nationComboBox->currentText();
+	QString mail = _mailEdit->text();
+	QString icon = _iconPath;
+
+	QByteArray block;
+	QDataStream out(&block, QIODevice::WriteOnly);
+	out.setVersion(QDataStream::Qt_5_6);
+
+	out << quint16(0) << quint8('r') << _id << _psw << nation << mail << icon;
+	out.device()->seek(0);
+	out << quint16(block.size() - sizeof(quint16));
+	_tcpSocket->write(block);
+
+	connect(_tcpSocket, SIGNAL(readyRead()), this, SLOT(replyForRegister()));
 }
 
-void RegisterUI::readInfo()
+void RegisterUI::replyForRegister()
 {
-}
+	disconnect(_tcpSocket, SIGNAL(readyRead()), this, SLOT(replyForRegister()));
 
-void RegisterUI::result()
-{
+	QDataStream in(_tcpSocket);
+	in.setVersion(QDataStream::Qt_5_6);
+
+	quint16 blockSize;
+	if (_tcpSocket->bytesAvailable() <= sizeof(quint16))
+	{
+		qDebug() << "Error size of block.";
+		_errLabel->setText(QString::fromLocal8Bit("ÍøÂç¹ÊÕÏ"));
+		_errLabel->setHidden(false);
+		return;
+	}
+
+	in >> blockSize;
+	if (_tcpSocket->bytesAvailable() < blockSize)
+	{
+		qDebug() << "No info in block.";
+		_errLabel->setText(QString::fromLocal8Bit("ÍøÂç¹ÊÕÏ"));
+		_errLabel->setHidden(false);
+		return;
+	}
+
+	quint8 flag;
+	in >> flag;
+
+	if (flag == 'o')/*register ok.*/
+	{
+		_tcpSocket->close();
+		//delete _tcpSocket;
+		//_tcpSocket = nullptr;
+		close();
+		(new LoginUI(_id, _psw))->show();
+	}
+	else/*Failed*/
+	{
+		_errLabel->setText(QString::fromLocal8Bit("×¢²áÊ§°Ü"));
+		_errLabel->setHidden(false);
+		return;
+	}
 }
 
 void RegisterUI::nextPage()
