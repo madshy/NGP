@@ -29,6 +29,7 @@ class QFrame;
 class QString;
 class QTcpSocket;
 class QFile;
+class QPixmap;
 
 class GameListWidget : public QWidget
 {
@@ -50,6 +51,8 @@ private:
 	QFile *_file;
 	QByteArray _inBlock;
 
+	QPixmap *backgroundPixmap;
+
 public:
 	GameListWidget(QList<GameListItem *> *, QWidget *parent = Q_NULLPTR);
 	~GameListWidget();
@@ -66,6 +69,17 @@ public:
 	*Actually, when signal min is emit.
 	*/
 	void hideDetail();
+
+	/*custom close actions*/
+	void customCloseSlot();
+
+signals:
+	void customCloseSignal();
+	void showDetailSignal();
+	void hideDetailSignal();
+
+protected:
+	void paintEvent(QPaintEvent *);
 };
 
 #endif

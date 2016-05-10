@@ -12,13 +12,14 @@
 	desc_path is a path of file decribing the game.
 	man_path is path of manual of the game.
 	d_load_path is path downloading the game.
+
+	**game_id unsigned smallint auto_increment primary key,
 *
 *********************************************/
 
 use ngp;
 
 create table Game(
-game_id unsigned smallint auto_increment primary key,
 name varchar(32) not null,
 nation varchar(28),
 icon varchar(64) not null, 

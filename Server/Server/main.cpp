@@ -11,7 +11,7 @@ int main(int argc, char *argv[])
 {
 	QCoreApplication a(argc, argv);
 
-	QHostAddress addr("127.0.0.1");
+	QHostAddress addr("192.168.150.1");
 	quint16 port(1994);
 
 	LoginServer loginServer(0, addr, port);

@@ -191,13 +191,13 @@ void LoginUI::initNet()
 {
 	/*init the connection.*/
 	_tcpSocket = new QTcpSocket;
-	if (!_tcpSocket->bind(QHostAddress("127.0.0.1"), 1995))
-	{
-		qDebug() << __FILE__ << __LINE__ << "Failed to bind.";
-		return;
-	}
+	//if (!_tcpSocket->bind(QHostAddress("192.168.150.128"), 1995))
+	//{
+	//	qDebug() << __FILE__ << __LINE__ << "Failed to bind.";
+	//	return;
+	//}
 
-	_tcpSocket->connectToHost(QHostAddress("127.0.0.1"), 1994);
+	_tcpSocket->connectToHost(QHostAddress("192.168.150.1"), 1994);
 }
 
 void LoginUI::login()
@@ -220,6 +220,8 @@ void LoginUI::login()
 	{
 		initNet();
 	}
+
+	qDebug() << "*********Socket State**********\n" << _tcpSocket->state();
 
 	/*Unavailable net.*/
 	if (QAbstractSocket::SocketState::UnconnectedState == _tcpSocket->state())

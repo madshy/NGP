@@ -216,6 +216,159 @@ void Login::login()
 
 	}
 
+	/*
+	*game center request.
+	*request format:
+	*blockSize + flag('g')
+	*
+	*reply format:
+	*blockSize + num + (name + iconPath + nation + descPath + manPath + downloadPath).....
+	*/
+	case 'g':
+	{
+		/*look into database.*/
+		QString sql("select * from Game");
+
+		if (_db.isOpen())
+		{
+			quint16 num = 0;
+			out << quint16(0) << quint16(0);
+			QString name;
+			QString nation;
+			QString icon;
+			QString desc;
+			QString man;
+			QString downloadPath;
+			query.exec(sql);
+			while (query.next())
+			{
+				++num;
+				
+				name = query.value("name").toString();
+				nation = query.value("nation").toString();
+				icon = query.value("icon").toString();
+				desc = query.value("desc_path").toString();
+				man = query.value("man_path").toString();
+				downloadPath = query.value("d_load_path").toString();
+
+				out << name << icon << nation << desc << man << downloadPath;
+			}
+
+			out.device()->seek(0);
+			out << quint16(block.size() - sizeof(quint16));
+
+			out.device()->seek(2);//what's the number?
+			out << quint16(num);
+
+			_tcpSock->write(block);
+		}
+		return;
+	}
+
+	/*
+	*Add buddy request
+	*Format:
+	*blockSize + flag('a') + id1 + id2
+	*id1 add id2 to his buddy.
+	*
+	*Reply format:
+	*blockSize + flag1('a') + flag2 + buddy(optional)
+	*flag2:'o' success while 'n' fail.
+	*if flag2 is 'n',no buddy
+	*if flag2 is 'o',buddy must be there.
+	*/
+	case 'a':
+	{
+		QString id1, id2;
+		in >> id1 >> id2;
+
+		if (_db.isOpen())
+		{
+			QString findBuddySql("select user_id from User where user_id = '");
+			findBuddySql += id2 + "'";
+
+			query.exec(findBuddySql);
+
+			/*not find the buddy, it's not a existing user.*/
+			if (!query.next())
+			{
+				out << quint16(0) << quint8('a') << quint8('n');
+				out.device()->seek(0);
+				out << quint16(block.size() - sizeof(quint16));
+				_tcpSock->write(block);
+			}
+			/*find the buddy and execute add operation*/
+			else
+			{
+				query.exec("insert into Buddy(user_id, buddy_id) values('" + id1 + "','" + id2 + "')");
+				query.exec("insert into Buddy(user_id, buddy_id) values('" + id2 + "','" + id1 + "')");
+				
+				out << quint16(0) << quint8('a') << quint8('o') << id2;
+				out.device()->seek(0);
+				out << quint16(block.size() - sizeof(quint16));
+				_tcpSock->write(block);
+			}
+		}
+		return;
+	}
+
+	/*
+	*Buddy Candidate request(nation)
+	*format:
+	*blockSize + flag('n') + id + nation
+	*
+	*Reply format:
+	*blockSize + flag('n') + num(n) + buddy1 + buddy2 + ... + buddyn
+	*/
+	case 'n':
+	{
+		if (_db.isOpen())
+		{
+			quint16 num = 0;
+			QString id;
+			QString nation;
+			in >> id >> nation;
+
+			out << quint16(0) << quint8('n') << num;
+
+			query.exec("select user_id from User "
+				"where nation = '" + nation + "'"
+				+ " and user_id != '" + id + "'"
+				+ " and user_id not in "
+				+ "(select buddy_id from buddy "
+				"where user_id = '" + id + "')");
+			while (query.next())
+			{
+				++num;
+				out << query.value("user_id").toString();
+			}
+
+			out.device()->seek(0);
+			out << quint16(block.size() - sizeof(quint16));
+
+			out.device()->seek(3);//what's the number?
+			out << quint16(num);
+
+			_tcpSock->write(block);
+		}
+		return;
+	}
+
+	/*
+	*Buddy Candidate request(game)
+	*format:
+	*blockSize + flag('G') + game1 + game2 + ... + gamen
+	*
+	*Reply format:
+	*blockSize + flag('G') + gameNum(n) + gameName1 + buddyNum(m) + buddy1 + ... + buddym
+	*+ ... + gameNamen + buddyNum(m) + buddy1 + ... + buddym.
+	*/
+	case 'G':
+	{
+		//not implement yet.
+		return;
+	}
+
 	/*default, not defined at present.*/
 	default:
 		break;

@@ -78,13 +78,13 @@ void RegisterUI::initNet()
 {
 	/*init the connection.*/
 	_tcpSocket = new QTcpSocket();
-	if (!_tcpSocket->bind(QHostAddress("127.0.0.1"), 1995))
+	if (!_tcpSocket->bind(QHostAddress("192.168.150.1"), 1995))
 	{
 		qDebug() << "Failed to bind.";
 		return;
 	}
 
-	_tcpSocket->connectToHost(QHostAddress("127.0.0.1"), 1994);
+	_tcpSocket->connectToHost(QHostAddress("192.168.150.1"), 1994);
 }
 
 void RegisterUI::initUI()

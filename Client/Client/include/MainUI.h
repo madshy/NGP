@@ -16,6 +16,8 @@
 
 #include <qwidget.h>
 
+#include "Account.h"
+
 /*forward declarations*/
 class QLabel;
 class QPushButton;
@@ -29,6 +31,11 @@ class GameListWidget;
 class QTcpSocket;
 
 class Account;
+
+class QPoint;
+class QPixmap;
+
+class QTreeWidgetItem;
 
 class MainUI : public QWidget
 {
@@ -53,18 +60,45 @@ private:
 
 	GameListWidget *_gameList;
 
+	QPoint *point;
+	QPixmap *backgroundPixmap;
+
+	Account _acc;
+
 public:
-	MainUI(qintptr, QWidget *parent = Q_NULLPTR);
-	MainUI(qintptr, const Account &, QWidget *parent = Q_NULLPTR);
+	//MainUI(qintptr, QWidget *parent = Q_NULLPTR);
+	MainUI(qintptr, Account, QWidget *parent = Q_NULLPTR);
 
 	protected slots:
-	void addBuddySlot();
-	void addGameSlot();
-	void gameCenterSlot();
+	/*send request slot when relative btn clicked.*/
+	void addBuddyRequest();
+	void gameCenterRequest();
+	/*read reply from server.*/
+	void addBuddy();
+	void addGame();
+	void gameCenter();
+
+	/*paint background.*/
+	void onlyMain();
+	void noDetail();
+	void showDetail();
+
+	/*close the gameListWidget*/
+	void closeGameList();
+
+	/*start the game*/
+	void startGame(QTreeWidgetItem *, int);
+	/*start the chat*/
+	void startChat(QTreeWidgetItem *, int);
 
 protected:
 	MainUI(const MainUI&);
 	const MainUI& operator = (const MainUI&);
+
+protected:
+	virtual void mousePressEvent(QMouseEvent *);
+	virtual void mouseMoveEvent(QMouseEvent *);
+	virtual void paintEvent(QPaintEvent *);
 };
 
 #endif

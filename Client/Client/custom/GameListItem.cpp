@@ -13,8 +13,8 @@
 GameListItem::GameListItem(
 	const QString &iconPath, const QString &name, const QString &nation,
 	const QString &desc, const QString &man, const QString &downloadPath, 
-	const QIcon &icon, const QString &text, QListWidget *parent, int type)
-	:QListWidgetItem(icon, text, parent, type), 
+	QListWidget *parent, int type)
+	:QListWidgetItem(QIcon(iconPath), name, parent, type), 
 	_iconPath(iconPath), _name(name), _nation(nation), _desc(desc), _man(man),
 	_downloadPath(downloadPath) , _infoMap()
 {

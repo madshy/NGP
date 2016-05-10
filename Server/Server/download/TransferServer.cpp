@@ -16,7 +16,7 @@
 TransferServer::TransferServer(QObject *parent)
 	:QTcpServer(parent)
 {
-	listen(QHostAddress("127.0.0.1"), 2016);
+	listen(QHostAddress("192.168.150.1"), 2016);
 }
 
 TransferServer::~TransferServer()

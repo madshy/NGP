@@ -28,12 +28,14 @@
 #include <qdatastream.h>
 #include <qtcpsocket.h>
 #include <qhostaddress.h>
+#include <qpainter.h>
+#include <qbitmap.h>
 
 #include "../include/GameDownloadThread.h"
 
 GameListWidget::GameListWidget(QList<GameListItem *> *list, QWidget *parent)
 	:QWidget(parent), _tcpSocket(nullptr), _totalBytes(0), _bytesReceived(0), _fileNameSize(0),
-	_fileName(), _file(nullptr), _inBlock()
+	_fileName(), _file(nullptr), _inBlock(), backgroundPixmap(nullptr)
 {
 	/*close Button*/
 	_closeBtn = new CloseButton;
@@ -70,7 +72,7 @@ GameListWidget::GameListWidget(QList<GameListItem *> *list, QWidget *parent)
 	setLayout(mainLayout);
 
 	/*signals and slots*/
-	connect(_closeBtn, SIGNAL(clicked()), this, SLOT(close()));
+	connect(_closeBtn, SIGNAL(clicked()), this, SLOT(customCloseSlot()));
 	connect(_list, SIGNAL(itemClicked(QListWidgetItem *)), this, SLOT(detail(QListWidgetItem *)));
 	connect(_list, SIGNAL(itemDoubleClicked(QListWidgetItem *)), this, SLOT(downloadRequest(QListWidgetItem *)));
 	connect(_detail, SIGNAL(min()), this, SLOT(hideDetail()));
@@ -83,11 +85,22 @@ GameListWidget::GameListWidget(QList<GameListItem *> *list, QWidget *parent)
 	_list->setStyleSheet("QListWidget{border: 0; background-color: rgba(0, 0, 0, 0);}");
 
 	setWindowFlags(Qt::FramelessWindowHint);
-	setFixedSize(450, 350);
+	//setFixedSize(450, 350);
 	QPalette palette;
 	palette.setBrush(backgroundRole(), QBrush(QImage(":/images/bg_list1.png")));
 	setPalette(palette);
 	setAutoFillBackground(true);
+
+	setAttribute(Qt::WA_TranslucentBackground);
+
+	backgroundPixmap = new QPixmap;
+	backgroundPixmap->load(":/images/bg_list1.png");
+
+	resize(backgroundPixmap->width(), backgroundPixmap->height());
+	clearMask();
+	setMask(backgroundPixmap->mask());
+
+	update();
 	//setStyleSheet("GameListWidget{background-image: url(:/images/bg_list1.png;)}");
 }
 
@@ -101,8 +114,8 @@ void GameListWidget::downloadRequest(QListWidgetItem *item)
 	if (!_tcpSocket)
 	{
 		_tcpSocket = new QTcpSocket;
-		_tcpSocket->bind(QHostAddress("127.0.0.1"), 2015);
-		_tcpSocket->connectToHost(QHostAddress("127.0.0.1"), 2016);
+		_tcpSocket->bind(QHostAddress("192.168.150.1"), 2015);
+		_tcpSocket->connectToHost(QHostAddress("192.168.150.1"), 2016);
 		connect(_tcpSocket, SIGNAL(readyRead()), this, SLOT(download()));
 	}
 
@@ -184,21 +197,54 @@ void GameListWidget::detail(QListWidgetItem *item)
 		gameItem->getIconPath(), gameItem->getDesc(), gameItem->getMan());
 	
 	_detail->setHidden(false);
-	setFixedSize(450, 700);
-	QPalette palette;
-	palette.setBrush(backgroundRole(), QBrush(QImage(":/images/bg_list2.png")));
-	setPalette(palette);
-	setAutoFillBackground(true);
+	//setFixedSize(450, 700);
+	//QPalette palette;
+	//palette.setBrush(backgroundRole(), QBrush(QImage(":/images/bg_list2.png")));
+	//setPalette(palette);
+	//setAutoFillBackground(true);
+
+	backgroundPixmap->load(":/images/bg_list2.png");
+
+	resize(backgroundPixmap->width(), backgroundPixmap->height());
+	clearMask();
+	setMask(backgroundPixmap->mask());
+
+	update();
 	//setStyleSheet("GameListWidget{background-image: url(:/images/bg_list2.png;)}");
+
+	emit showDetailSignal();
 }
 
 void GameListWidget::hideDetail()
 {
 	_detail->setHidden(true);
-	setFixedSize(450, 350);
-	QPalette palette;
-	palette.setBrush(backgroundRole(), QBrush(QImage(":/images/bg_list1.png")));
-	setPalette(palette);
-	setAutoFillBackground(true);
+	//setFixedSize(450, 350);
+	//QPalette palette;
+	//palette.setBrush(backgroundRole(), QBrush(QImage(":/images/bg_list1.png")));
+	//setPalette(palette);
+	//setAutoFillBackground(true);
+
 	//setStyleSheet("GameListWidget{background-image: url(:/images/bg_list1.png;)}");
+
+	backgroundPixmap->load(":/images/bg_list1.png");
+
+	resize(backgroundPixmap->width(), backgroundPixmap->height());
+	clearMask();
+	setMask(backgroundPixmap->mask());
+
+	update();
+
+	emit hideDetailSignal();
+}
+
+void GameListWidget::customCloseSlot()
+{
+	emit customCloseSignal();
+	close();
+}
+
+void GameListWidget::paintEvent(QPaintEvent *)
+{
+	QPainter painter(this);
+	painter.fillRect(0, 0, backgroundPixmap->width(), backgroundPixmap->height(), *backgroundPixmap);
 }

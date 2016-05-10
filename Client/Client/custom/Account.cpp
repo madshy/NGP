@@ -10,8 +10,8 @@
 
 #include "../include/Account.h"
 
-Account::Account(const QString &name, const QString &nation, const QString &icon,
-	const QList<QString> &buddys, const QList<QString> &games)
+Account::Account(const QString name, const QString nation, const QString icon,
+	const QList<QString> buddys, const QList<QString> games)
 	:_name(name), _nation(nation), _icon(icon), _buddyList(buddys), _gameList(games)
 {
 }
