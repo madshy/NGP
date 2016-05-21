@@ -39,6 +39,8 @@
 #include <qfile.h>
 #include <qlist.h>
 
+#include "../include/Game.h"
+
 LoginUI::LoginUI(QWidget *parent)
 	:QWidget(parent), _tcpSocket(nullptr)
 {
@@ -348,13 +350,22 @@ void LoginUI::replyForQueryBuddys()
 
 	/*get buddys*/
 	quint16 numBuddys;
-	in >> numBuddys;
+	quint16 numGames;
+	in >> numBuddys >> numGames;
 	QList<QString> buddys;
 	QString buddy;
 	for (quint16 index = 0; index < numBuddys; ++index)
 	{
 		in >> buddy;
 		buddys.append(buddy);
+	}
+
+	QString gameName, gamePath;
+	QList<Game> games;
+	for (quint16 index = 0; index < numGames; ++index)
+	{
+		in >> gameName >> gamePath;
+		games.append({ gameName, gamePath });
 	}
 
 	/*
@@ -376,7 +387,7 @@ void LoginUI::replyForQueryBuddys()
 	*/
 	quintptr sockDesc = _tcpSocket->socketDescriptor();
 	showMinimized();
-	(new MainUI(sockDesc, Account(_id, _nation, _icon, buddys, QList<Game>())))->show();
+	(new MainUI(sockDesc, Account(_id, _nation, _icon, buddys, games)))->show();
 	close();
 
 }

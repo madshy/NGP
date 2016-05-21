@@ -20,6 +20,7 @@
 use ngp;
 
 create table Game(
+game_id int primary key auto_increment,
 name varchar(32) not null,
 nation varchar(28),
 icon varchar(64) not null, 

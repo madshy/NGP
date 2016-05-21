@@ -49,6 +49,7 @@
 #include <qprocess.h>
 
 #include "../include/GameDownloadThread.h"
+#include "../include/Game.h"
 
 #include <qmessagebox.h>
 #include <qhostaddress.h>
@@ -183,6 +184,15 @@ MainUI::MainUI(qintptr socketDescriptor, Account account, QWidget *parent)
 	QTreeWidgetItem *mygame = new QTreeWidgetItem;
 	mygame->setText(0, QString::fromLocal8Bit("我的游戏"));
 	mygame->setText(1, "");
+
+	for (QList<Game>::const_iterator citor = _acc.getGames().cbegin();
+		citor != _acc.getGames().cend(); ++citor)
+	{
+		QTreeWidgetItem *newGame = new QTreeWidgetItem(mygame);
+		newGame->setText(0, citor->Name);
+		newGame->setText(1, citor->DownloadPath);
+	}
+
 	gameTree->addTopLevelItem(mygame);
 	QTreeWidgetItem *localgame = new QTreeWidgetItem;
 	localgame->setText(0, QString::fromLocal8Bit("本地游戏"));

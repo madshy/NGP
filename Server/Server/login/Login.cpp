@@ -179,7 +179,7 @@ void Login::login()
 	*blockSize + flag('b') + user_id
 	*
 	*reply format:
-	*blockSize + flag('b') + quint16(num) + num QStrings(buddy).
+	*blockSize + flag('b') + quint16(num1) + quint16(num2)+ num QStrings(buddy) + num2 Game(QString, QString).
 	*num is the number of buddys.
 	*/
 	case 'b':
@@ -188,27 +188,45 @@ void Login::login()
 		QString user_id;
 		in >> user_id;
 
-		/*look into database.*/
-		QString sql("select * from Buddy where user_id = '");
-		sql += user_id + "'";
-
 		if (_db.isOpen())
 		{
-			quint16 num = 0;
-			out << quint16(0) << quint8('b') << quint16(0);
+			/*look into database.*/
+			QString sql("select * from Buddy where user_id = '");
+			sql += user_id + "'";
+
+			quint16 numBuddy = 0;
+			quint16 numGame = 0;
+			out << quint16(0) << quint8('b') << quint16(0) << quint16(0);
 			query.exec(sql);
 			while (query.next())
 			{
-				++num;
+				++numBuddy;
 				QString buddy = query.value("buddy_id").toString();
 				out << buddy;
+			}
+
+			sql = "select name, d_load_path from Game where game_id in ("
+				"select game_id from User_game where user_id = '";
+			sql += user_id + "')";
+
+			QString gameName;
+			QString downloadPath;
+			query.exec(sql);
+			while (query.next())
+			{
+				++numGame;
+				gameName = query.value("name").toString();
+				downloadPath = query.value("d_load_path").toString();
+				out << gameName << downloadPath;
 			}
 
 			out.device()->seek(0);
 			out << quint16(block.size() - sizeof(quint16));
 
 			out.device()->seek(3);//what's the number?
-			out << quint16(num);
+			out << quint16(numBuddy);
+
+			out << quint16(numGame);
 
 			_tcpSock->write(block);
 		}
