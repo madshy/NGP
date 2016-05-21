@@ -26,6 +26,7 @@
 #include "../include/GameListWidget.h"
 #include "../include/GameListItem.h"
 #include "../include/AddBuddyWidget.h"
+#include "../include/AddGameWidget.h"
 
 /*layout header*/
 #include <qboxlayout.h>
@@ -233,7 +234,8 @@ MainUI::MainUI(qintptr socketDescriptor, Account account, QWidget *parent)
 	connect(_clsBtn, SIGNAL(clicked()), this, SLOT(close()));
 	connect(_gameCenterBtn, SIGNAL(clicked()), this, SLOT(gameCenterRequest()));
 	connect(_addBuddyBtn, SIGNAL(clicked()), this, SLOT(addBuddy()));
-	connect(_addLocalGameBtn, SIGNAL(clicked()), this, SLOT(addGame()));
+	connect(_addLocalGameBtn, SIGNAL(clicked()), this, SLOT(addLocalGame()));
+	connect(_addServerGameBtn, SIGNAL(clicked()), this, SLOT(addGame()));
 
 	setMouseTracking(true);
 
@@ -260,6 +262,12 @@ void MainUI::addBuddyRequest()
 
 }
 
+void MainUI::addGameRequest()
+{
+
+}
+
+
 void MainUI::gameCenterRequest()
 {
 	/*
@@ -284,7 +292,7 @@ void MainUI::addBuddy()
 	addBuddyWidget->show();
 }
 
-void MainUI::addGame()
+void MainUI::addLocalGame()
 {
 	QString gamePath = QFileDialog::getOpenFileName(this, QString::fromLocal8Bit("—°‘Ò”Œœ∑"), "", tr("Files (*.exe)"));
 	QString gameName = gamePath.right(gamePath.size() - gamePath.lastIndexOf('/') - 1);
@@ -318,6 +326,13 @@ void MainUI::addGame()
 
 	}
 
+}
+
+void MainUI::addGame()
+{
+	AddGameWidget *addGameWidget = new AddGameWidget(_acc.getName(),
+		_acc.getNation(), dynamic_cast<QTreeWidget *>(_buddyGameTabWidget->widget(1)));
+	addGameWidget->show();
 }
 
 void MainUI::gameCenter()

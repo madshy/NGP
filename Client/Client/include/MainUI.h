@@ -87,9 +87,11 @@ public:
 	protected slots:
 	/*send request slot when relative btn clicked.*/
 	void addBuddyRequest();
+	void addGameRequest();
 	void gameCenterRequest();
 	/*read reply from server.*/
 	void addBuddy();
+	void addLocalGame();
 	void addGame();
 	void gameCenter();
 

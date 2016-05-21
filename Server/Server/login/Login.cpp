@@ -387,6 +387,121 @@ void Login::login()
 		return;
 	}
 
+	/*
+	*Add game request
+	*Format:
+	*blockSize + flag('A') + id + game_name
+	*
+	*Reply format:
+	*blockSize + flag1('A') + flag2 + game_name(optional, add game_path if have game_name) 
+	*flag2:'o' success while 'n' fail.
+	*if flag2 is 'n',no game add.
+	*if flag2 is 'o',game_name must be there, add game_path back to game_name.
+	*/
+	case 'A':
+	{
+		QString id, game_name;
+		in >> id >> game_name;
+
+		if (_db.isOpen())
+		{
+			QString findGameSql("select game_id, d_load_path from Game where name = '");
+			findGameSql += game_name + "'";
+
+			query.exec(findGameSql);
+
+			/*not find the buddy, it's not a existing user.*/
+			if (!query.next())
+			{
+				out << quint16(0) << quint8('A') << quint8('n');
+				out.device()->seek(0);
+				out << quint16(block.size() - sizeof(quint16));
+				_tcpSock->write(block);
+				return;
+			}
+			/*find the game and execute add operation*/
+			else
+			{
+				int game_id = query.value("game_id").toInt();
+				QString gamePath = query.value("d_load_path").toString();
+
+				query.finish();
+
+				query.prepare("insert into user_game(user_id,game_id)"
+					"values(?,?)");
+				query.addBindValue(id);
+				query.addBindValue(game_id);
+				query.exec();
+				qDebug() << "==============" << query.lastError().text() << "==============";
+				//query.exec("insert into User_game(user_id,game_id) values(" + id + "," + game_id + ")");
+				
+				int result = query.numRowsAffected();
+
+				out << quint16(0) << quint8('A') << quint8('o') << game_name << gamePath;
+				out.device()->seek(0);
+				out << quint16(block.size() - sizeof(quint16));
+				_tcpSock->write(block);
+			}
+		}
+		return;
+	}
+
+	/*
+	*Game Candidate request(nation)
+	*format:
+	*blockSize + flag('N') + id + nation
+	*
+	*Reply format:
+	*blockSize + flag('N') + num(n) + game1 + game2 + ... + gamen
+	*/
+	case 'N':
+	{
+		if (_db.isOpen())
+		{
+			quint16 num = 0;
+			QString id;
+			QString nation;
+			in >> id >> nation;
+
+			out << quint16(0) << quint8('N') << num;
+
+			query.exec("select name from game "
+				"where nation = '" + nation + "'"
+				+ " and game_id not in "
+				+ "(select game_id from user_game "
+				"where user_id = '" + id + "')");
+			while (query.next())
+			{
+				++num;
+				out << query.value("name").toString();
+			}
+
+			out.device()->seek(0);
+			out << quint16(block.size() - sizeof(quint16));
+
+			out.device()->seek(3);//what's the number?
+			out << quint16(num);
+
+			_tcpSock->write(block);
+		}
+		return;
+	}
+
+	/*
+	*Game Candidate request(buddy)
+	*format:
+	*blockSize + flag('B') + buddy1 + buddy2 + ... + buddyn
+	*
+	*Reply format:
+	*blockSize + flag('B') + gameNum(n) + gameName1 + buddyNum(m) + buddy1 + ... + buddym
+	*+ ... + gameNamen + buddyNum(m) + buddy1 + ... + buddym.
+	*/
+	case 'B':
+	{
+		//not implement yet.
+		return;
+	}
+
 	/*default, not defined at present.*/
 	default:
 		break;

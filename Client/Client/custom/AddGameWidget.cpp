@@ -1,18 +1,16 @@
 /***************************************************
 *
-*    @file:AddBuddyWidget.cpp
+*    @file:AddGameWidget.cpp
 *    @author:madshy
 *    @mail:madshy94@163.com
-*    @date:2016/05/10
-*    @comment:Implement AddBuddyWidget
+*    @date:2016/05/22
+*    @comment:Implement AddGameWidget
 *
 ***************************************************/
 
 /*custom widget*/
-#include "../include/AddBuddyWidget.h"
+#include "../include/AddGameWidget.h"
 #include "../include/CloseButton.h"
-
-#include "../include/Account.h"
 
 /*Qt widget*/
 #include <qlistwidget.h>
@@ -34,8 +32,8 @@
 #include <qboxlayout.h>
 #include <qevent.h>
 
-AddBuddyWidget::AddBuddyWidget(const QString &accId, const QString &accNation, QTreeWidget *buddyTree, QWidget *parent)
-	:QWidget(parent), _accId(accId), _accNation(accNation), _buddyTree(buddyTree)
+AddGameWidget::AddGameWidget(const QString &accId, const QString &accNation, QTreeWidget *buddyTree, QWidget *parent)
+	:QWidget(parent), _accId(accId), _accNation(accNation), _gameTree(buddyTree)
 {
 	_point = new QPoint;
 
@@ -45,9 +43,9 @@ AddBuddyWidget::AddBuddyWidget(const QString &accId, const QString &accNation, Q
 	btnLayout->addWidget(_closeBtn);
 
 	_choiceList = new QListWidget;
-	_choiceList->addItem(QString::fromLocal8Bit("账号添加"));
+	_choiceList->addItem(QString::fromLocal8Bit("名字添加"));
 	_choiceList->addItem(QString::fromLocal8Bit("民族添加"));
-	_choiceList->addItem(QString::fromLocal8Bit("兴趣添加"));
+	_choiceList->addItem(QString::fromLocal8Bit("好友添加"));
 	_choiceList->setFixedWidth(60);
 	_choiceList->setStyleSheet("QListWidget{border: 0; background-color: rgba(0, 0, 0, 0);}");
 	QVBoxLayout *listLayout = new QVBoxLayout;
@@ -58,27 +56,27 @@ AddBuddyWidget::AddBuddyWidget(const QString &accId, const QString &accNation, Q
 	_choiceStack = new QStackedWidget;
 	QWidget *accPage = new QWidget;
 	QWidget *gamePage = new QWidget;
-	
+
 	_choiceStack->addWidget(accPage);
 	_choiceStack->addWidget(new QListWidget);
 	_choiceStack->addWidget(gamePage);
 
 	/*acc page*/
-	_accEdit = new QLineEdit;
-	_accEdit->setPlaceholderText(QString::fromLocal8Bit("好友账号"));
+	_gameNameEdit = new QLineEdit;
+	_gameNameEdit->setPlaceholderText(QString::fromLocal8Bit("游戏名称"));
 	QPushButton *addBtn = new QPushButton(QString::fromLocal8Bit("添加"));
-	connect(addBtn, SIGNAL(clicked()), this, SLOT(addBuddy()));
+	connect(addBtn, SIGNAL(clicked()), this, SLOT(addGame()));
 	QHBoxLayout *accPageLayout = new QHBoxLayout;
 	accPageLayout->setAlignment(Qt::AlignHCenter);
-	accPageLayout->addWidget(_accEdit);
+	accPageLayout->addWidget(_gameNameEdit);
 	accPageLayout->addWidget(addBtn);
 	accPage->setLayout(accPageLayout);
 
 	/*nation page*/
-	
+
 
 	/*game page*/
-	QLabel *gameLabel = new QLabel(QString::fromLocal8Bit("游戏添加好友功能内测ing,敬请期待"), gamePage);
+	QLabel *gameLabel = new QLabel(QString::fromLocal8Bit("好友游戏添加游戏功能内测ing,敬请期待"), gamePage);
 
 	QHBoxLayout *widgetLayout = new QHBoxLayout;
 	widgetLayout->addLayout(listLayout);
@@ -101,9 +99,10 @@ AddBuddyWidget::AddBuddyWidget(const QString &accId, const QString &accNation, Q
 	QDataStream out(&block, QIODevice::WriteOnly);
 	out.setVersion(QDataStream::Qt_5_6);
 
+	/*init nation part*/
 	qDebug() << _accId;
 	qDebug() << _accNation;
-	out << quint16(0) << quint8('n') << _accId << _accNation;
+	out << quint16(0) << quint8('N') << _accId << _accNation;
 	out.device()->seek(0);
 	out << quint16(block.size() - sizeof(quint16));
 
@@ -114,49 +113,50 @@ AddBuddyWidget::AddBuddyWidget(const QString &accId, const QString &accNation, Q
 
 }
 
-void AddBuddyWidget::addBuddy()
+void AddGameWidget::addGame()
 {
-	addBuddy(_accEdit->text());
+	addGame(_gameNameEdit->text());
 }
 
-void AddBuddyWidget::addBuddy(const QString &buddy)
+void AddGameWidget::addGame(const QString &Game)
 {
-	if (buddy == _accId)
+	//find group
+	for (int indexOut = 0; indexOut < _gameTree->topLevelItemCount(); ++indexOut)
 	{
-		QMessageBox::information(0, QString::fromLocal8Bit("添加结果"),
-			QString::fromLocal8Bit("无法添加自己为好友"), QMessageBox::Ok);
-		return;
-	}
-
-	QTreeWidgetItem *group = _buddyTree->topLevelItem(0);
-	for (int index = 0; index < group->childCount(); ++index)
-	{
-		if (buddy == group->child(index)->text(0))
+		if (QString::fromLocal8Bit("我的游戏") == _gameTree->topLevelItem(indexOut)->text(0))
 		{
-			QMessageBox::information(0, QString::fromLocal8Bit("添加结果"),
-				QString::fromLocal8Bit("该用户已经在好友列表中，无法重复添加"), QMessageBox::Ok);
-			return;
+			//find exist or not.
+			for (int indexIn = 0; indexIn < _gameTree->topLevelItem(indexOut)->childCount(); ++indexIn)
+			{
+				if (Game == _gameTree->topLevelItem(indexOut)->child(indexIn)->text(0))
+				{
+					QMessageBox::information(0, QString::fromLocal8Bit("添加结果"),
+						QString::fromLocal8Bit("该游戏已经在游戏列表中，无法重复添加"), QMessageBox::Ok);
+					return;
+				}
+			}
 		}
 	}
-	
+
+
 	QByteArray block;
 	QDataStream out(&block, QIODevice::WriteOnly);
 	out.setVersion(QDataStream::Qt_5_6);
 
-	out << quint16(0) << quint8('a') << _accId << buddy;
+	out << quint16(0) << quint8('A') << _accId << Game;
 	out.device()->seek(0);
 	out << quint16(block.size() - sizeof(quint16));
 
 	_tcpSocket->write(block);
 }
 
-void AddBuddyWidget::addBuddy(QListWidgetItem *item)
+void AddGameWidget::addGame(QListWidgetItem *item)
 {
-	addBuddy(item->text());
+	addGame(item->text());
 }
 
 
-void AddBuddyWidget::readReply()
+void AddGameWidget::readReply()
 {
 	QDataStream in(_tcpSocket);
 	in.setVersion(QDataStream::Qt_5_6);
@@ -174,71 +174,73 @@ void AddBuddyWidget::readReply()
 		qDebug() << "No info in block.";
 		return;
 	}
-	
+
 	quint8 replyType;
 	in >> replyType;
 	switch (replyType)
 	{
-		case 'a':
-		{
-			quint8 flag;
-			in >> flag;
-			
-			/*fail to add*/
-			if ('n' == flag)
-			{
-				QMessageBox::warning(0, QString::fromLocal8Bit("添加结果"), 
-					QString::fromLocal8Bit("输入用户不存在"), QMessageBox::Ok);
-			}
-			/*success*/
-			else
-			{
-				QString buddy;
-				in >> buddy;
+	case 'A':
+	{
+		quint8 flag;
+		in >> flag;
 
-				/*add to the buddy list.or refresh*/
-				QTreeWidgetItem *group = _buddyTree->topLevelItem(0);
-				QTreeWidgetItem *newBuddy = new QTreeWidgetItem(group);
-				newBuddy->setText(0, buddy);
-				newBuddy->setText(1, "accountID");
-				//_buddyTree->update();
-				
-				/*QMessageBox::information(0, QString::fromLocal8Bit("添加结果"),
-					QString::fromLocal8Bit(("成功添加" + buddy + "为好友").toLatin1()), QMessageBox::Ok);*/
-				QMessageBox::information(0, QString::fromLocal8Bit("添加结果"),
-					QString::fromLocal8Bit("添加成功"), QMessageBox::Ok);
-			}
-			return;
+		/*fail to add*/
+		if ('n' == flag)
+		{
+			QMessageBox::warning(0, QString::fromLocal8Bit("添加结果"),
+				QString::fromLocal8Bit("该游戏不存在"), QMessageBox::Ok);
+		}
+		/*success*/
+		else
+		{
+			QString gameName, gamePath;
+			in >> gameName >> gamePath;
+
+			/*add to the Game list.or refresh*/
+			QTreeWidgetItem *group = 
+				QString::fromLocal8Bit("我的游戏") == _gameTree->topLevelItem(0)->text(0) ? 
+				_gameTree->topLevelItem(0) : _gameTree->topLevelItem(1);
+			QTreeWidgetItem *newGame = new QTreeWidgetItem(group);
+			newGame->setText(0, gameName);
+			newGame->setText(1, gamePath);
+			//_buddyTree->update();
+
+			/*QMessageBox::information(0, QString::fromLocal8Bit("添加结果"),
+			QString::fromLocal8Bit(("成功添加" + Game + "为好友").toLatin1()), QMessageBox::Ok);*/
+			QMessageBox::information(0, QString::fromLocal8Bit("添加结果"),
+				QString::fromLocal8Bit("添加成功"), QMessageBox::Ok);
+		}
+		return;
+	}
+
+	case 'N':
+	{
+		quint16 num;
+		in >> num;
+
+		QString game;
+
+		QListWidget *list = dynamic_cast<QListWidget *>(_choiceStack->widget(1));
+		connect(list, SIGNAL(itemDoubleClicked(QListWidgetItem *)), this, SLOT(addGame(QListWidgetItem *)));
+		list->setStyleSheet("QListWidget{border: 0; background-color: rgba(0, 0, 0, 0);}");
+		for (int index = 0; index < num; ++index)
+		{
+			in >> game;
+			list->addItem(new QListWidgetItem(game));
 		}
 
-		case 'n':
-		{
-			quint16 num;
-			in >> num;
+		return;
+	}
 
-			QString buddy;
-
-			QListWidget *list = dynamic_cast<QListWidget *>(_choiceStack->widget(1));
-			connect(list, SIGNAL(itemDoubleClicked(QListWidgetItem *)), this, SLOT(addBuddy(QListWidgetItem *)));
-			list->setStyleSheet("QListWidget{border: 0; background-color: rgba(0, 0, 0, 0);}");
-			for (int index = 0; index < num; ++index)
-			{
-				in >> buddy;
-				list->addItem(new QListWidgetItem(buddy));
-			}
-
-			return;
-		}
-
-		default:
-		{
-			return;
-		}
+	default:
+	{
+		return;
+	}
 	}
 
 }
 
-void AddBuddyWidget::mousePressEvent(QMouseEvent *event)
+void AddGameWidget::mousePressEvent(QMouseEvent *event)
 {
 	if (Qt::LeftButton == event->button())
 	{
@@ -247,7 +249,7 @@ void AddBuddyWidget::mousePressEvent(QMouseEvent *event)
 	}
 }
 
-void AddBuddyWidget::mouseMoveEvent(QMouseEvent *event)
+void AddGameWidget::mouseMoveEvent(QMouseEvent *event)
 {
 	/*buttons not button*/
 	if (event->buttons() & Qt::LeftButton)
