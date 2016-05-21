@@ -36,5 +36,11 @@
     <file alias="9.png">../icons/users/9.png</file>
     <file alias="10.png">../icons/users/10.png</file>
   </qresource>
+  
+  <!--files-->
+  <qresource prefix="files">
+    <file alias="desc.html">../files/desc.html</file>
+    <file alias="man.html">../files/man.html</file>
+  </qresource>
 </RCC>
 <!--40line-->

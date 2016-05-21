@@ -13,7 +13,7 @@ use ngp;
 
 create table user_game(
 user_id varchar(11),
-game_id unsigned smallint,
+game_id int,
 primary key (user_id, game_id),
 foreign key (user_id) references User(user_id)
 	on delete cascade,

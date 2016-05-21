@@ -61,7 +61,9 @@
 //}
 
 MainUI::MainUI(qintptr socketDescriptor, Account account, QWidget *parent)
-	: QWidget(parent), _tcpSocket(), _gameList(nullptr), _acc(account)
+	: QWidget(parent), _tcpSocket(nullptr), _gameList(nullptr), _acc(account), _tcpSocketDownload(nullptr), 
+	_totalBytes(0), _bytesReceived(0), _fileNameSize(0),
+	_fileName(), _file(nullptr), _inBlock()
 {
 	point = new QPoint;
 
@@ -575,7 +577,9 @@ void MainUI::download()
 	//else/*Fail to receive file*/
 	if (_bytesReceived == _totalBytes)
 	{
-		QMessageBox::information(0, QString::fromLocal8Bit("游戏下载"), QString::fromLocal8Bit("下载完成"), QMessageBox::Ok);
-		_file->close();
+		if (QMessageBox::Ok == QMessageBox::information(0, QString::fromLocal8Bit("游戏下载"), QString::fromLocal8Bit("下载完成"), QMessageBox::Ok))
+		{
+			_file->close();
+		}
 	}
 }
