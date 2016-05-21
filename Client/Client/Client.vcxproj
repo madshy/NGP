@@ -434,6 +434,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Account.h" />
+    <ClInclude Include="include\Game.h" />
     <CustomBuild Include="include\AddBuddyWidget.h">
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(QTDIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Moc%27ing AddBuddyWidget.h...</Message>

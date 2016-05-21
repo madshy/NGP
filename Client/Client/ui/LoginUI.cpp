@@ -376,7 +376,7 @@ void LoginUI::replyForQueryBuddys()
 	*/
 	quintptr sockDesc = _tcpSocket->socketDescriptor();
 	showMinimized();
-	(new MainUI(sockDesc, Account(_id, _nation, _icon, buddys, QList<QString>())))->show();
+	(new MainUI(sockDesc, Account(_id, _nation, _icon, buddys, QList<Game>())))->show();
 	close();
 
 }

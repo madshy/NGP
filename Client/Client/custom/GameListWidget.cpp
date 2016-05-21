@@ -114,7 +114,7 @@ void GameListWidget::downloadRequest(QListWidgetItem *item)
 	if (!_tcpSocket)
 	{
 		_tcpSocket = new QTcpSocket;
-		_tcpSocket->bind(QHostAddress("192.168.150.1"), 2015);
+		//_tcpSocket->bind(QHostAddress("192.168.150.1"), 2015);
 		_tcpSocket->connectToHost(QHostAddress("192.168.150.1"), 2016);
 		connect(_tcpSocket, SIGNAL(readyRead()), this, SLOT(download()));
 	}

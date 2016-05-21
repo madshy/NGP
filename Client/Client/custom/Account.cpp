@@ -11,7 +11,7 @@
 #include "../include/Account.h"
 
 Account::Account(const QString name, const QString nation, const QString icon,
-	const QList<QString> buddys, const QList<QString> games)
+	const QList<QString> buddys, const QList<Game> games)
 	:_name(name), _nation(nation), _icon(icon), _buddyList(buddys), _gameList(games)
 {
 }

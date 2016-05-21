@@ -15,6 +15,8 @@
 #define MAINUI_H
 
 #include <qwidget.h>
+#include <qbytearray.h>
+#include <qstring.h>
 
 #include "Account.h"
 
@@ -37,6 +39,8 @@ class QPixmap;
 
 class QTreeWidgetItem;
 
+class QFile;
+
 class MainUI : public QWidget
 {
 	Q_OBJECT
@@ -51,7 +55,8 @@ private:
 
 	QPushButton *_gameCenterBtn;
 	QPushButton *_addBuddyBtn;
-	QPushButton *_addGameBtn;
+	QPushButton *_addLocalGameBtn;
+	QPushButton *_addServerGameBtn;
 	QPushButton *_iconBtn;
 
 	QTabWidget *_buddyGameTabWidget;
@@ -64,6 +69,16 @@ private:
 	QPixmap *backgroundPixmap;
 
 	Account _acc;
+
+	/*transfer arg*/
+	QTcpSocket *_tcpSocketDownload;
+	qint64 _totalBytes;
+	qint64 _bytesReceived;
+	qint64 _fileNameSize;
+
+	QString _fileName;
+	QFile *_file;
+	QByteArray _inBlock;
 
 public:
 	//MainUI(qintptr, QWidget *parent = Q_NULLPTR);
@@ -90,6 +105,11 @@ public:
 	void startGame(QTreeWidgetItem *, int);
 	/*start the chat*/
 	void startChat(QTreeWidgetItem *, int);
+
+	/*send download request*/
+	void downloadRequest(const QString &);
+	/*receive download file*/
+	void download();
 
 protected:
 	MainUI(const MainUI&);

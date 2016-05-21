@@ -17,6 +17,8 @@
 #include <qlist.h>
 #include <qstring.h>
 
+#include "../include/Game.h"
+
 class Account
 {
 private:
@@ -25,24 +27,24 @@ private:
 	QString _icon;
 
 	QList<QString> _buddyList;
-	QList<QString> _gameList;
+	QList<Game> _gameList;
 
 public:
-	Account(const QString, const QString, const QString, const QList<QString>, const QList<QString>);
+	Account(const QString, const QString, const QString, const QList<QString>, const QList<Game>);
 
 	inline const QString  getName();
 	inline const QString  getNation();
 	inline const QString  getIcon();
 
 	inline const QList<QString> getBuddys();
-	inline const QList<QString> getGames();
+	inline const QList<Game> getGames();
 
 	inline const QString  getName() const ;
 	inline const QString  getNation() const;
 	inline const QString  getIcon() const ;
 
 	inline const QList<QString> getBuddys() const;
-	inline const QList<QString> getGames() const;
+	inline const QList<Game> getGames() const;
 };
 
 inline const QString Account::getName()
@@ -65,7 +67,7 @@ inline const QList<QString> Account::getBuddys()
 	return _buddyList;
 }
 
-inline const QList<QString> Account::getGames()
+inline const QList<Game> Account::getGames()
 {
 	return _gameList;
 }
@@ -90,7 +92,7 @@ inline const QList<QString> Account::getBuddys() const
 	return _buddyList;
 }
 
-inline const QList<QString> Account::getGames() const
+inline const QList<Game> Account::getGames() const
 {
 	return _gameList;
 }

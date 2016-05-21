@@ -184,5 +184,8 @@
     <ClInclude Include="include\Account.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\Game.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

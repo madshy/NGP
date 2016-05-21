@@ -48,6 +48,11 @@
 #include <qfiledialog.h>
 #include <qprocess.h>
 
+#include "../include/GameDownloadThread.h"
+
+#include <qmessagebox.h>
+#include <qhostaddress.h>
+
 //MainUI::MainUI(qintptr socketDescriptor, QWidget *parent)
 //	:QWidget(parent), _tcpSocket(), _gameList(nullptr)
 //{
@@ -179,6 +184,10 @@ MainUI::MainUI(qintptr socketDescriptor, Account account, QWidget *parent)
 	mygame->setText(0, QString::fromLocal8Bit("我的游戏"));
 	mygame->setText(1, "");
 	gameTree->addTopLevelItem(mygame);
+	QTreeWidgetItem *localgame = new QTreeWidgetItem;
+	localgame->setText(0, QString::fromLocal8Bit("本地游戏"));
+	localgame->setText(1, "");
+	gameTree->addTopLevelItem(localgame);
 
 	connect(gameTree, SIGNAL(itemDoubleClicked(QTreeWidgetItem *, int)), this, SLOT(startGame(QTreeWidgetItem *, int)));
 
@@ -187,10 +196,12 @@ MainUI::MainUI(qintptr socketDescriptor, Account account, QWidget *parent)
 
 	/*add push button*/
 	_addBuddyBtn = new QPushButton(QString::fromLocal8Bit("添加好友"));
-	_addGameBtn = new QPushButton(QString::fromLocal8Bit("添加游戏"));
+	_addLocalGameBtn = new QPushButton(QString::fromLocal8Bit("添加本地游戏"));
+	_addServerGameBtn = new QPushButton(QString::fromLocal8Bit("添加远程游戏"));
 	QHBoxLayout *addLayout = new QHBoxLayout;
 	addLayout->addWidget(_addBuddyBtn);
-	addLayout->addWidget(_addGameBtn);
+	addLayout->addWidget(_addLocalGameBtn);
+	addLayout->addWidget(_addServerGameBtn);
 
 	QVBoxLayout *mainLayout = new QVBoxLayout;
 	mainLayout->addLayout(logoLayout);
@@ -210,7 +221,7 @@ MainUI::MainUI(qintptr socketDescriptor, Account account, QWidget *parent)
 	connect(_clsBtn, SIGNAL(clicked()), this, SLOT(close()));
 	connect(_gameCenterBtn, SIGNAL(clicked()), this, SLOT(gameCenterRequest()));
 	connect(_addBuddyBtn, SIGNAL(clicked()), this, SLOT(addBuddy()));
-	connect(_addGameBtn, SIGNAL(clicked()), this, SLOT(addGame()));
+	connect(_addLocalGameBtn, SIGNAL(clicked()), this, SLOT(addGame()));
 
 	setMouseTracking(true);
 
@@ -285,7 +296,7 @@ void MainUI::addGame()
 	for (int index = 0; index < gameTree->topLevelItemCount(); ++index)
 	{
 		/*find the target*/
-		if (gameTree->topLevelItem(index)->text(0) == QString::fromLocal8Bit("我的游戏"))
+		if (gameTree->topLevelItem(index)->text(0) == QString::fromLocal8Bit("本地游戏"))
 		{
 			QTreeWidgetItem *gameItem = new QTreeWidgetItem(gameTree->topLevelItem(index));
 			gameItem->setText(0, game);
@@ -449,8 +460,21 @@ void MainUI::startGame(QTreeWidgetItem *item, int column)
 		return;
 	}
 
-	QProcess *process = new QProcess;
-	process->start(gamePath);
+	QTreeWidgetItem *parent = item->parent();
+	//local game and start play.
+	if (QString::fromLocal8Bit("本地游戏") == parent->text(0))
+	{
+		QProcess *process = new QProcess;
+		process->start(gamePath);
+		//return;
+	}
+
+	//server game and start download.
+	if (QString::fromLocal8Bit("我的游戏") == parent->text(0))
+	{
+		downloadRequest(gamePath);
+	}
+
 }
 
 void MainUI::startChat(QTreeWidgetItem *item, int column)
@@ -466,4 +490,82 @@ void MainUI::startChat(QTreeWidgetItem *item, int column)
 
 	/*To chat*/
 	
+}
+
+void MainUI::downloadRequest(const QString &downloadPath)
+{
+	if (!_tcpSocketDownload)
+	{
+		_tcpSocketDownload = new QTcpSocket;
+		//_tcpSocketDownload->bind(QHostAddress("192.168.150.1"), 2015);
+		_tcpSocketDownload->connectToHost(QHostAddress("192.168.150.1"), 2016);
+		connect(_tcpSocketDownload, SIGNAL(readyRead()), this, SLOT(download()));
+	}
+
+	QByteArray outBlock;
+	QDataStream out(&outBlock, QIODevice::WriteOnly);
+	out.setVersion(QDataStream::Qt_5_6);
+
+	out << downloadPath;
+	_tcpSocketDownload->write(outBlock);
+}
+
+void MainUI::download()
+{
+	///*because response readyRead in GameDownloadThread*/
+	//disconnect(_tcpSocket, SIGNAL(readyRead()), this, SLOT(download()));
+
+	//(new GameDownloadThread(_tcpSocket, this))->start();
+
+	QDataStream in(_tcpSocketDownload);
+	in.setVersion(QDataStream::Qt_5_6);
+
+	if (_bytesReceived <= sizeof(qint64) * 2)
+	{
+		if ((_tcpSocketDownload->bytesAvailable() >= sizeof(qint64) * 2)
+			&& (0 == _fileNameSize))
+		{
+			in >> _totalBytes >> _fileNameSize;
+			_bytesReceived += sizeof(qint64) * 2;
+		}
+
+		if ((_tcpSocketDownload->bytesAvailable() >= _fileNameSize)
+			&& (0 != _fileNameSize))
+		{
+			in >> _fileName;
+			_bytesReceived += _fileNameSize;
+
+			_file = new QFile(_fileName);
+			if (!_file->open(QFile::WriteOnly))
+			{
+				QMessageBox::warning(0, QString::fromLocal8Bit("应用程序"),
+					QString::fromLocal8Bit("无法读取文件 %1:\n%2.").arg(_fileName).arg(_file->errorString()));
+				return;
+			}
+		}
+		else
+		{
+			return;
+		}
+	}
+
+
+	if (_bytesReceived < _totalBytes)
+	{
+		_bytesReceived += _tcpSocketDownload->bytesAvailable();
+		_inBlock = _tcpSocketDownload->readAll();
+		_file->write(_inBlock);
+		_inBlock.resize(0);
+	}
+
+
+
+	/****************************why else cause error(can't receive file content.)*********************
+	*****************************Why if can receive ok !!!!!!!!!!!!!!!!!!!!!!*************************/
+	//else/*Fail to receive file*/
+	if (_bytesReceived == _totalBytes)
+	{
+		QMessageBox::information(0, QString::fromLocal8Bit("游戏下载"), QString::fromLocal8Bit("下载完成"), QMessageBox::Ok);
+		_file->close();
+	}
 }
