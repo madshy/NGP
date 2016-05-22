@@ -95,21 +95,21 @@ AddBuddyWidget::AddBuddyWidget(const QString &accId, const QString &accNation, Q
 	_tcpSocket->connectToHost(QHostAddress("192.168.150.1"), 1994);
 	connect(_tcpSocket, SIGNAL(readyRead()), this, SLOT(readReply()));
 
-	/*send request*/
-	QByteArray block;
-	QDataStream out(&block, QIODevice::WriteOnly);
-	out.setVersion(QDataStream::Qt_5_6);
+	///*send request*/
+	//QByteArray block;
+	//QDataStream out(&block, QIODevice::WriteOnly);
+	//out.setVersion(QDataStream::Qt_5_6);
 
-	qDebug() << _accId;
-	qDebug() << _accNation;
-	out << quint16(0) << quint8('n') << _accId << _accNation;
-	out.device()->seek(0);
-	out << quint16(block.size() - sizeof(quint16));
+	//qDebug() << _accId;
+	//qDebug() << _accNation;
+	//out << quint16(0) << quint8('n') << _accId << _accNation;
+	//out.device()->seek(0);
+	//out << quint16(block.size() - sizeof(quint16));
 
-	_tcpSocket->write(block);
+	//_tcpSocket->write(block);
 
 	connect(_closeBtn, SIGNAL(clicked()), this, SLOT(close()));
-	connect(_choiceList, SIGNAL(currentRowChanged(int)), _choiceStack, SLOT(setCurrentIndex(int)));
+	connect(_choiceList, SIGNAL(currentRowChanged(int)), this, SLOT(setCurrentIndexProxy(int)));
 
 	setStyleSheet("QListWidget{border: 0; background-color: rgba(0, 0, 0, 0);}");
 
@@ -220,6 +220,7 @@ void AddBuddyWidget::readReply()
 			QString buddy;
 
 			QListWidget *list = dynamic_cast<QListWidget *>(_choiceStack->widget(1));
+			list->clear();
 			connect(list, SIGNAL(itemDoubleClicked(QListWidgetItem *)), this, SLOT(addBuddy(QListWidgetItem *)));
 			list->setStyleSheet("QListWidget{border: 0; background-color: rgba(0, 0, 0, 0);}");
 			for (int index = 0; index < num; ++index)
@@ -239,6 +240,7 @@ void AddBuddyWidget::readReply()
 			QString buddy;
 
 			QListWidget *list = dynamic_cast<QListWidget *>(_choiceStack->widget(2));
+			list->clear();
 			connect(list, SIGNAL(itemDoubleClicked(QListWidgetItem *)), this, SLOT(addBuddy(QListWidgetItem *)));
 			list->setStyleSheet("QListWidget{border: 0; background-color: rgba(0, 0, 0, 0);}");
 			for (int index = 0; index < num; ++index)
@@ -275,4 +277,39 @@ void AddBuddyWidget::mouseMoveEvent(QMouseEvent *event)
 		move(event->globalPos() - *_point);
 		event->accept();
 	}
+}
+
+void AddBuddyWidget::setCurrentIndexProxy(int index)
+{
+
+	/*send request*/
+	QByteArray block;
+	QDataStream out(&block, QIODevice::WriteOnly);
+	out.setVersion(QDataStream::Qt_5_6);
+
+	switch (index)
+	{
+	case 1:
+	{
+		/*init nation part*/
+		out << quint16(0) << quint8('n') << _accId << _accNation;
+		out.device()->seek(0);
+		out << quint16(block.size() - sizeof(quint16));
+		_tcpSocket->write(block);
+		break;
+	}
+
+	case 2:
+	{
+		out << quint16(0) << quint8('G') << _accId;
+		out.device()->seek(0);
+		out << quint16(block.size() - sizeof(quint16));
+		_tcpSocket->write(block);
+		break;
+	}
+	default:
+		break;
+	}
+
+	_choiceStack->setCurrentIndex(index);
 }
