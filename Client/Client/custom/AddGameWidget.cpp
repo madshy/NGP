@@ -59,7 +59,7 @@ AddGameWidget::AddGameWidget(const QString &accId, const QString &accNation, QTr
 
 	_choiceStack->addWidget(accPage);
 	_choiceStack->addWidget(new QListWidget);
-	_choiceStack->addWidget(gamePage);
+	_choiceStack->addWidget(new QListWidget);
 
 	/*acc page*/
 	_gameNameEdit = new QLineEdit;
@@ -76,7 +76,7 @@ AddGameWidget::AddGameWidget(const QString &accId, const QString &accNation, QTr
 
 
 	/*game page*/
-	QLabel *gameLabel = new QLabel(QString::fromLocal8Bit("好友游戏添加游戏功能内测ing,敬请期待"), gamePage);
+	//QLabel *gameLabel = new QLabel(QString::fromLocal8Bit("好友游戏添加游戏功能内测ing,敬请期待"), gamePage);
 
 	QHBoxLayout *widgetLayout = new QHBoxLayout;
 	widgetLayout->addLayout(listLayout);
@@ -100,16 +100,26 @@ AddGameWidget::AddGameWidget(const QString &accId, const QString &accNation, QTr
 	out.setVersion(QDataStream::Qt_5_6);
 
 	/*init nation part*/
-	qDebug() << _accId;
-	qDebug() << _accNation;
 	out << quint16(0) << quint8('N') << _accId << _accNation;
 	out.device()->seek(0);
 	out << quint16(block.size() - sizeof(quint16));
 
 	_tcpSocket->write(block);
 
+	//GG,这里居然把整个信息重新写过去了，难怪会出错！！所以这里的信息是一直没有读取完毕。。。
+	//本来想要修改，添加一个QTcpSocket的。。。
+	block.clear();
+
+	out << quint16(0) << quint8('B') << _accId;
+	out.device()->seek(0);
+	out << quint16(block.size() - sizeof(quint16));
+
+	_tcpSocket->write(block);
+
 	connect(_closeBtn, SIGNAL(clicked()), this, SLOT(close()));
-	connect(_choiceList, SIGNAL(currentRowChanged(int)), _choiceStack, SLOT(setCurrentIndex(int)));
+	connect(_choiceList, SIGNAL(currentRowChanged(int)), this, SLOT(setCurrentIndexProxy(int)));
+
+	setStyleSheet("QListWidget{border: 0; background-color: rgba(0, 0, 0, 0);}");
 
 }
 
@@ -135,6 +145,7 @@ void AddGameWidget::addGame(const QString &Game)
 					return;
 				}
 			}
+			break;
 		}
 	}
 
@@ -232,6 +243,25 @@ void AddGameWidget::readReply()
 		return;
 	}
 
+	//如果只是把这里去掉，而没有修改上面的两次_tcpSocket->write()，则可以进行正常添加
+	case 'B':
+	{
+		quint16 num;
+		in >> num;
+
+		QString game;
+
+		QListWidget *list = dynamic_cast<QListWidget *>(_choiceStack->widget(2));
+		connect(list, SIGNAL(itemDoubleClicked(QListWidgetItem *)), this, SLOT(addGame(QListWidgetItem *)));
+		list->setStyleSheet("QListWidget{border: 0; background-color: rgba(0, 0, 0, 0);}");
+		for (int index = 0; index < num; ++index)
+		{
+			in >> game;
+			list->addItem(new QListWidgetItem(game));
+		}
+		return;
+	}
+
 	default:
 	{
 		return;
@@ -257,4 +287,22 @@ void AddGameWidget::mouseMoveEvent(QMouseEvent *event)
 		move(event->globalPos() - *_point);
 		event->accept();
 	}
+}
+
+void AddGameWidget::setCurrentIndexProxy(int index)
+{
+	switch (index)
+	{
+	case 1:
+	{
+
+		break;
+	}
+	
+	case 2:
+	{
+		break;
+	}
+	}
+	_choiceStack->setCurrentIndex(index);
 }

@@ -64,6 +64,9 @@ protected:
 
 private:
 	void addGame(const QString &);
+
+	public slots:
+	void setCurrentIndexProxy(int);
 };
 
 #endif

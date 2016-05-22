@@ -46,6 +46,7 @@ GameListWidget::GameListWidget(QList<GameListItem *> *list, QWidget *parent)
 	/*list*/
 	_list = new QListWidget;
 	_list->setViewMode(QListView::IconMode);
+	_list->setFixedSize(400, 300);
 	for (QList<GameListItem *>::iterator itor = list->begin(); itor != list->end(); ++itor)
 	{
 		_list->addItem(*itor);
@@ -101,6 +102,7 @@ GameListWidget::GameListWidget(QList<GameListItem *> *list, QWidget *parent)
 	setMask(backgroundPixmap->mask());
 
 	update();
+	setStyleSheet("color: #B0E0E6;");
 	//setStyleSheet("GameListWidget{background-image: url(:/images/bg_list1.png;)}");
 }
 

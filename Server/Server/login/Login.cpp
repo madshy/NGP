@@ -16,6 +16,7 @@
 #include <qbytearray.h>
 #include <qdatastream.h>
 #include <qdebug.h>
+#include <qset.h>
 
 
 
@@ -57,6 +58,19 @@ void Login::login()
 	/*ok to read and reading flag.*/
 	quint8 requestType;
 	in >> requestType;
+
+	qDebug() << "===========================================================";
+	QByteArray ba;
+	QDataStream ob(&ba, QIODevice::WriteOnly);
+	if (requestType == '\0')
+	{
+		unsigned char i;
+		while (!in.atEnd())
+		{
+			in >> i;
+			ob << i;
+		}
+	}
 
 	QByteArray block;
 	QDataStream out(&block, QIODevice::WriteOnly);
@@ -375,15 +389,43 @@ void Login::login()
 	/*
 	*Buddy Candidate request(game)
 	*format:
-	*blockSize + flag('G') + game1 + game2 + ... + gamen
+	*blockSize + flag('G') + id
 	*
 	*Reply format:
-	*blockSize + flag('G') + gameNum(n) + gameName1 + buddyNum(m) + buddy1 + ... + buddym
-	*+ ... + gameNamen + buddyNum(m) + buddy1 + ... + buddym.
+	*blockSize + flag('G') + BuddyNum(m) + buddy1 + ... + buddym
 	*/
 	case 'G':
 	{
-		//not implement yet.
+		if (_db.isOpen())
+		{
+			QString user_id;
+			in >> user_id;
+
+			quint16  num = 0;
+			out << quint16(0) << quint8('G') << quint16(0);
+
+			query.exec("select user_id from user_game"
+				"where game_id in("
+				"select game_id from user_game"
+				"where user_id = '" + user_id + "')"
+				"and user_id not in("
+				"select buddy_id from buddy"
+				"where user_id = '" + user_id + "')");
+
+			while (query.next())
+			{
+				++num;
+				out << query.value(0).toString();
+			}
+
+			out.device()->seek(0);
+			out << quint16(block.size() - sizeof(quint16));
+
+			out.device()->seek(3);//what's the number?
+			out << quint16(num);
+
+			_tcpSock->write(block);
+		}
 		return;
 	}
 
@@ -490,15 +532,42 @@ void Login::login()
 	/*
 	*Game Candidate request(buddy)
 	*format:
-	*blockSize + flag('B') + buddy1 + buddy2 + ... + buddyn
+	*blockSize + flag('B') + id
 	*
 	*Reply format:
-	*blockSize + flag('B') + gameNum(n) + gameName1 + buddyNum(m) + buddy1 + ... + buddym
-	*+ ... + gameNamen + buddyNum(m) + buddy1 + ... + buddym.
+	*blockSize + flag('B') + gameNum(n) + game1 + ... + gamen;
 	*/
 	case 'B':
 	{
-		//not implement yet.
+		if (_db.isOpen())
+		{
+			QString user_id;
+			in >> user_id;
+
+			quint16  num = 0;
+			out << quint16(0) << quint8('B') << quint16(0);
+
+			query.exec("select name from game"
+				"where game_id in("
+				"select game_id from user_game"
+				"where user_id in("
+				"select buddy_id from buddy"
+				"where user_id = '" + user_id + "')");
+
+			while (query.next())
+			{
+				++num;
+				out << query.value(0).toString();
+			}
+
+			out.device()->seek(0);
+			out << quint16(block.size() - sizeof(quint16));
+
+			out.device()->seek(3);//what's the number?
+			out << quint16(num);
+
+			_tcpSock->write(block);
+		}
 		return;
 	}
 

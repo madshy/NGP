@@ -255,6 +255,7 @@ MainUI::MainUI(qintptr socketDescriptor, Account account, QWidget *parent)
 
 
 	update();
+	setStyleSheet("color: #708090;");
 }
 
 void MainUI::addBuddyRequest()

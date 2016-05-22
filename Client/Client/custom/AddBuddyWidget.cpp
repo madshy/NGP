@@ -61,7 +61,7 @@ AddBuddyWidget::AddBuddyWidget(const QString &accId, const QString &accNation, Q
 	
 	_choiceStack->addWidget(accPage);
 	_choiceStack->addWidget(new QListWidget);
-	_choiceStack->addWidget(gamePage);
+	_choiceStack->addWidget(new QListWidget);
 
 	/*acc page*/
 	_accEdit = new QLineEdit;
@@ -75,10 +75,9 @@ AddBuddyWidget::AddBuddyWidget(const QString &accId, const QString &accNation, Q
 	accPage->setLayout(accPageLayout);
 
 	/*nation page*/
-	
 
 	/*game page*/
-	QLabel *gameLabel = new QLabel(QString::fromLocal8Bit("游戏添加好友功能内测ing,敬请期待"), gamePage);
+
 
 	QHBoxLayout *widgetLayout = new QHBoxLayout;
 	widgetLayout->addLayout(listLayout);
@@ -111,6 +110,8 @@ AddBuddyWidget::AddBuddyWidget(const QString &accId, const QString &accNation, Q
 
 	connect(_closeBtn, SIGNAL(clicked()), this, SLOT(close()));
 	connect(_choiceList, SIGNAL(currentRowChanged(int)), _choiceStack, SLOT(setCurrentIndex(int)));
+
+	setStyleSheet("QListWidget{border: 0; background-color: rgba(0, 0, 0, 0);}");
 
 }
 
@@ -219,6 +220,25 @@ void AddBuddyWidget::readReply()
 			QString buddy;
 
 			QListWidget *list = dynamic_cast<QListWidget *>(_choiceStack->widget(1));
+			connect(list, SIGNAL(itemDoubleClicked(QListWidgetItem *)), this, SLOT(addBuddy(QListWidgetItem *)));
+			list->setStyleSheet("QListWidget{border: 0; background-color: rgba(0, 0, 0, 0);}");
+			for (int index = 0; index < num; ++index)
+			{
+				in >> buddy;
+				list->addItem(new QListWidgetItem(buddy));
+			}
+
+			return;
+		}
+
+		case 'G':
+		{
+			quint16 num;
+			in >> num;
+
+			QString buddy;
+
+			QListWidget *list = dynamic_cast<QListWidget *>(_choiceStack->widget(2));
 			connect(list, SIGNAL(itemDoubleClicked(QListWidgetItem *)), this, SLOT(addBuddy(QListWidgetItem *)));
 			list->setStyleSheet("QListWidget{border: 0; background-color: rgba(0, 0, 0, 0);}");
 			for (int index = 0; index < num; ++index)
