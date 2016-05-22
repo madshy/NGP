@@ -67,6 +67,9 @@ protected:
 private:
 	void addBuddy(const QString &);
 
+	public slots:
+	void setCurrentIndexProxy(int);
+
 };
 
 #endif

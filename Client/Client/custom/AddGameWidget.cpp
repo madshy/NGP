@@ -94,28 +94,6 @@ AddGameWidget::AddGameWidget(const QString &accId, const QString &accNation, QTr
 	_tcpSocket->connectToHost(QHostAddress("192.168.150.1"), 1994);
 	connect(_tcpSocket, SIGNAL(readyRead()), this, SLOT(readReply()));
 
-	/*send request*/
-	QByteArray block;
-	QDataStream out(&block, QIODevice::WriteOnly);
-	out.setVersion(QDataStream::Qt_5_6);
-
-	/*init nation part*/
-	out << quint16(0) << quint8('N') << _accId << _accNation;
-	out.device()->seek(0);
-	out << quint16(block.size() - sizeof(quint16));
-
-	_tcpSocket->write(block);
-
-	//GG,这里居然把整个信息重新写过去了，难怪会出错！！所以这里的信息是一直没有读取完毕。。。
-	//本来想要修改，添加一个QTcpSocket的。。。
-	block.clear();
-
-	out << quint16(0) << quint8('B') << _accId;
-	out.device()->seek(0);
-	out << quint16(block.size() - sizeof(quint16));
-
-	_tcpSocket->write(block);
-
 	connect(_closeBtn, SIGNAL(clicked()), this, SLOT(close()));
 	connect(_choiceList, SIGNAL(currentRowChanged(int)), this, SLOT(setCurrentIndexProxy(int)));
 
@@ -232,6 +210,7 @@ void AddGameWidget::readReply()
 		QString game;
 
 		QListWidget *list = dynamic_cast<QListWidget *>(_choiceStack->widget(1));
+		list->clear();
 		connect(list, SIGNAL(itemDoubleClicked(QListWidgetItem *)), this, SLOT(addGame(QListWidgetItem *)));
 		list->setStyleSheet("QListWidget{border: 0; background-color: rgba(0, 0, 0, 0);}");
 		for (int index = 0; index < num; ++index)
@@ -252,6 +231,7 @@ void AddGameWidget::readReply()
 		QString game;
 
 		QListWidget *list = dynamic_cast<QListWidget *>(_choiceStack->widget(2));
+		list->clear();
 		connect(list, SIGNAL(itemDoubleClicked(QListWidgetItem *)), this, SLOT(addGame(QListWidgetItem *)));
 		list->setStyleSheet("QListWidget{border: 0; background-color: rgba(0, 0, 0, 0);}");
 		for (int index = 0; index < num; ++index)
@@ -291,18 +271,35 @@ void AddGameWidget::mouseMoveEvent(QMouseEvent *event)
 
 void AddGameWidget::setCurrentIndexProxy(int index)
 {
+
+	/*send request*/
+	QByteArray block;
+	QDataStream out(&block, QIODevice::WriteOnly);
+	out.setVersion(QDataStream::Qt_5_6);
+
 	switch (index)
 	{
 	case 1:
 	{
-
+		/*init nation part*/
+		out << quint16(0) << quint8('N') << _accId << _accNation;
+		out.device()->seek(0);
+		out << quint16(block.size() - sizeof(quint16));
+		_tcpSocket->write(block);
 		break;
 	}
 	
 	case 2:
 	{
+		out << quint16(0) << quint8('B') << _accId;
+		out.device()->seek(0);
+		out << quint16(block.size() - sizeof(quint16));
+		_tcpSocket->write(block);
 		break;
 	}
+	default:
+		break;
 	}
+
 	_choiceStack->setCurrentIndex(index);
 }

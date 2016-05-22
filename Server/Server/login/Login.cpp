@@ -59,18 +59,18 @@ void Login::login()
 	quint8 requestType;
 	in >> requestType;
 
-	qDebug() << "===========================================================";
-	QByteArray ba;
-	QDataStream ob(&ba, QIODevice::WriteOnly);
-	if (requestType == '\0')
-	{
-		unsigned char i;
-		while (!in.atEnd())
-		{
-			in >> i;
-			ob << i;
-		}
-	}
+	//qDebug() << "===========================================================";
+	//QByteArray ba;
+	//QDataStream ob(&ba, QIODevice::WriteOnly);
+	//if (requestType == '\0')
+	//{
+	//	unsigned char i;
+	//	while (!in.atEnd())
+	//	{
+	//		in >> i;
+	//		ob << i;
+	//	}
+	//}
 
 	QByteArray block;
 	QDataStream out(&block, QIODevice::WriteOnly);
@@ -404,12 +404,13 @@ void Login::login()
 			quint16  num = 0;
 			out << quint16(0) << quint8('G') << quint16(0);
 
-			query.exec("select user_id from user_game"
-				"where game_id in("
-				"select game_id from user_game"
-				"where user_id = '" + user_id + "')"
-				"and user_id not in("
-				"select buddy_id from buddy"
+			query.exec("select user_id from user_game "
+				"where user_id != '" + user_id + "' "
+				"and game_id in( "
+				"select game_id from user_game "
+				"where user_id = '" + user_id + "') "
+				"and user_id not in( "
+				"select buddy_id from buddy "
 				"where user_id = '" + user_id + "')");
 
 			while (query.next())
@@ -547,12 +548,17 @@ void Login::login()
 			quint16  num = 0;
 			out << quint16(0) << quint8('B') << quint16(0);
 
-			query.exec("select name from game"
-				"where game_id in("
-				"select game_id from user_game"
-				"where user_id in("
-				"select buddy_id from buddy"
-				"where user_id = '" + user_id + "')");
+			QString testSql = "select name from game "
+				"where game_id not in( "
+				"select game_id from user_game "
+				"where user_id = '" + user_id + "') "
+				"and game_id in( "
+				"select game_id from user_game "
+				"where user_id in( "
+				"select buddy_id from buddy "
+				"where user_id = '" + user_id + "'))";
+			qDebug() << testSql;
+			query.exec(testSql);
 
 			while (query.next())
 			{
